@@ -3,625 +3,386 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>文具下單系統</title>
+<title>包裝物料倉儲管理系統</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root {
-  --bg: #0f1117;
-  --card: #1a1d27;
-  --border: #2a2e3a;
-  --text: #e8eaed;
-  --muted: #9aa0a6;
-  --accent: #4f8cff;
-  --accent2: #00c853;
-  --warning: #ffb300;
-  --danger: #ff5252;
-  --radius: 12px;
+  --bg: #0f1117; --card: #1a1d27; --border: #2a2e3a; --text: #e8eaed; --muted: #9aa0a6;
+  --accent: #4f8cff; --accent2: #00c853; --warning: #ffb300; --danger: #ff5252; --radius: 12px;
 }
 * { box-sizing: border-box; }
-body {
-  margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang HK", "Microsoft JhengHei", sans-serif;
-  background: var(--bg); color: var(--text); line-height: 1.5;
-}
-header {
-  background: linear-gradient(135deg, #1a1d27, #252836);
-  padding: 16px 20px; border-bottom: 1px solid var(--border);
-  position: sticky; top: 0; z-index: 10;
-  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
-}
-h1 { margin: 0; font-size: 1.3rem; font-weight: 700; }
-h1 span { color: var(--accent); }
+body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang HK", "Microsoft JhengHei", sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+header { background: linear-gradient(135deg, #1a1d27, #252836); padding: 16px 20px; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+h1 { margin: 0; font-size: 1.3rem; font-weight: 700; } h1 span { color: var(--accent); }
 .tabs { display: flex; gap: 8px; flex-wrap: wrap; }
-.tabs button {
-  background: transparent; border: 1px solid var(--border); color: var(--muted);
-  padding: 8px 14px; border-radius: 20px; cursor: pointer; font-size: 0.9rem;
-}
+.tabs button { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 8px 14px; border-radius: 20px; cursor: pointer; font-size: 0.9rem; }
 .tabs button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-.login-info { font-size: 0.85rem; color: var(--muted); display: flex; align-items: center; gap: 8px; }
-main { max-width: 1320px; margin: 0 auto; padding: 20px; }
+main { max-width: 1500px; margin: 0 auto; padding: 20px; }
 .section { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 20px; }
-
-/* Two-column Order Layout */
-.order-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 360px;
-  gap: 20px;
-  align-items: start;
-}
-.order-main-col { min-width: 0; }
-.order-side-col {
-  position: sticky;
-  top: 82px;
-}
-.side-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px;
-}
-.side-card h3 {
-  margin: 0 0 12px;
-  font-size: 1.05rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.side-summary-list {
-  max-height: 48vh;
-  overflow-y: auto;
-  padding-right: 4px;
-  margin-bottom: 14px;
-}
-.side-empty {
-  color: var(--muted);
-  font-size: 0.9rem;
-  text-align: center;
-  padding: 28px 10px;
-  background: #12141c;
-  border: 1px dashed var(--border);
-  border-radius: 10px;
-  margin-bottom: 14px;
-}
-
-.form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 12px; }
+.form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 12px; }
 label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 4px; }
-input, select, textarea {
-  width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border);
-  background: #12141c; color: var(--text); font-size: 1rem;
-}
-input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
+input, select, textarea { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); background: #12141c; color: var(--text); font-size: 1rem; }
+input:focus, select:focus { outline: none; border-color: var(--accent); }
+.btn { background: var(--accent); color: #fff; border: none; padding: 10px 20px; border-radius: 10px; font-size: 0.95rem; font-weight: 600; cursor: pointer; }
+.btn:hover { opacity: 0.9; } .btn.secondary { background: #252836; border: 1px solid var(--border); color: var(--text); }
+.btn.success { background: var(--accent2); color: #000; } .btn.warning { background: var(--warning); color: #000; }
+.btn.danger { background: var(--danger); color: #fff; }
+.btn.sm { padding: 4px 10px; font-size: 0.8rem; }
+table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+th { background: #252836; color: var(--text); padding: 8px; text-align: left; position: sticky; top: 0; }
+td { padding: 7px 8px; border-bottom: 1px solid var(--border); }
+tr:hover { background: #1e2230; }
+.status-Critical { color: var(--danger); font-weight: 700; } .status-Low { color: var(--warning); font-weight: 700; } .status-OK { color: var(--accent2); }
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.stat-card { background: #12141c; border: 1px solid var(--border); border-radius: 10px; padding: 14px; text-align: center; }
+.stat-card .num { font-size: 1.6rem; font-weight: 700; } .stat-card .label { font-size: 0.8rem; color: var(--muted); }
+.stat-critical .num { color: var(--danger); } .stat-low .num { color: var(--warning); } .stat-ok .num { color: var(--accent2); }
+.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--accent2); color: #000; padding: 12px 24px; border-radius: 10px; font-weight: 600; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 100; }
+.toast.show { opacity: 1; } .empty { text-align: center; color: var(--muted); padding: 40px; }
 .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
-.filters button {
-  background: #252836; border: 1px solid var(--border); color: var(--text);
-  padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 0.85rem;
-}
+.filters button { background: #252836; border: 1px solid var(--border); color: var(--text); padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; }
 .filters button.active { background: var(--accent); border-color: var(--accent); }
-.search-box { margin-bottom: 16px; }
-.item-list { display: flex; flex-direction: column; gap: 10px; }
-.item {
-  display: grid; grid-template-columns: 1fr auto auto auto; gap: 12px; align-items: center;
-  padding: 12px; background: #12141c; border-radius: 10px; border: 1px solid var(--border);
-}
-.item-info { min-width: 0; display: flex; align-items: center; gap: 12px; }
-.item-thumb {
-  width: 52px; height: 52px; object-fit: cover; border-radius: 8px;
-  border: 1px solid var(--border); background: #1e2230; flex-shrink: 0;
-}
-.item-thumb-placeholder {
-  width: 52px; height: 52px; border-radius: 8px; border: 1px dashed var(--border);
-  background: #181b25; color: var(--muted); font-size: 0.7rem;
-  display: flex; align-items: center; justify-content: center; text-align: center; flex-shrink: 0;
-}
-.item-text { min-width: 0; }
-.item-name { font-weight: 600; word-break: break-word; }
-.item-name a { color: var(--accent); text-decoration: none; }
-.item-name a:hover { text-decoration: underline; }
-.item-meta { font-size: 0.8rem; color: var(--muted); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 2px; }
-.item-link {
-  color: var(--accent); text-decoration: none; font-size: 0.78rem;
-  background: #4f8cff1a; padding: 2px 8px; border-radius: 10px; border: 1px solid #4f8cff44;
-}
-.item-link:hover { background: #4f8cff33; }
-.qty-control { display: flex; align-items: center; gap: 6px; }
-.qty-control button {
-  width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border);
-  background: #252836; color: var(--text); cursor: pointer; font-size: 1.1rem;
-}
-.qty-control input { width: 60px; text-align: center; padding: 6px; }
-.unit { color: var(--muted); font-size: 0.85rem; min-width: 48px; text-align: right; }
-.item-actions { display: flex; align-items: center; gap: 6px; }
-.icon-btn {
-  background: #252836; border: 1px solid var(--border); color: var(--muted);
-  padding: 6px 10px; border-radius: 8px; cursor: pointer; font-size: 0.8rem;
-}
-.icon-btn:hover { color: var(--text); border-color: var(--accent); }
-.icon-btn.del:hover { color: #fff; background: var(--danger); border-color: var(--danger); }
-
-.summary-item {
-  display: flex; justify-content: space-between; align-items: center; gap: 8px;
-  padding: 8px 10px; font-size: 0.9rem; background: #12141c;
-  border: 1px solid var(--border); border-radius: 8px; margin-bottom: 6px;
-}
-.summary-item-name { flex: 1; min-width: 0; word-break: break-word; }
-.summary-item-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; color: var(--accent); font-weight: 600; }
-.summary-remove {
-  background: transparent; border: none; color: var(--muted); cursor: pointer;
-  font-size: 1rem; padding: 0 4px; line-height: 1;
-}
-.summary-remove:hover { color: var(--danger); }
-
-.btn {
-  background: var(--accent); color: #fff; border: none; padding: 12px 24px;
-  border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer; width: 100%;
-}
-.btn:hover { opacity: 0.9; }
-.btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.btn.secondary { background: #252836; border: 1px solid var(--border); }
-.btn.success { background: var(--accent2); color: #000; }
-.btn.warning { background: var(--warning); color: #000; }
-.btn.danger { background: var(--danger); }
-.month-group { margin-bottom: 24px; }
-.month-title {
-  font-size: 1.1rem; font-weight: 700; margin: 0 0 12px;
-  padding-bottom: 8px; border-bottom: 2px solid var(--accent);
-  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
-}
-.month-title .count { font-size: 0.85rem; color: var(--muted); font-weight: normal; }
-.order-card {
-  background: #12141c; border: 1px solid var(--border); border-radius: 10px;
-  padding: 16px; margin-bottom: 12px; position: relative;
-}
-.order-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; flex-wrap: wrap; gap: 8px; }
-.badge { padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
-.badge.pending { background: #ffb30033; color: #ffb300; }
-.badge.ordered { background: #4f8cff33; color: #4f8cff; }
-.badge.arrived { background: #00c85333; color: #00c853; }
-.badge.cancelled { background: #ff525233; color: #ff5252; }
-.empty { text-align: center; color: var(--muted); padding: 40px; }
-.toast {
-  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-  background: var(--accent2); color: #000; padding: 12px 24px; border-radius: 10px;
-  font-weight: 600; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 100;
-}
-.toast.show { opacity: 1; }
-.status-select { width: auto; padding: 4px 8px; font-size: 0.85rem; }
-.filter-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
-.checkbox-label { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; cursor: pointer; }
-.bulk-bar {
-  background: #252836; border: 1px solid var(--border); border-radius: 10px;
-  padding: 12px; margin-bottom: 16px; display: none; align-items: center; gap: 10px; flex-wrap: wrap;
-}
-.bulk-bar.show { display: flex; }
-.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
-.stat-card {
-  background: #12141c; border: 1px solid var(--border); border-radius: 10px; padding: 16px; text-align: center;
-}
-.stat-card .num { font-size: 1.8rem; font-weight: 700; }
-.stat-card .label { font-size: 0.85rem; color: var(--muted); }
-.login-modal {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 200;
-}
-.login-modal.show { display: flex; }
-.login-box { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; width: 90%; max-width: 420px; }
-.add-item-form { display: none; background: #1e2230; border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--border); }
-.add-item-form.show { display: block; }
-.sync-status { font-size: 0.8rem; padding: 3px 10px; border-radius: 12px; background: #252836; color: var(--muted); }
-.sync-status.ok { color: var(--accent2); }
-.sync-status.err { color: var(--danger); }
-
-@media (max-width: 900px) {
-  .order-layout {
-    grid-template-columns: 1fr;
-  }
-  .order-side-col {
-    position: static;
-  }
-  .side-summary-list {
-    max-height: none;
-  }
-}
-@media (max-width: 600px) {
-  .item { grid-template-columns: 1fr; }
-  .qty-control { justify-content: flex-end; }
-  .item-actions { justify-content: flex-end; }
-  .order-header { flex-direction: column; }
-}
+.formula-box { background: #12141c; border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 16px; font-size: 0.9rem; }
+.formula-box strong { color: var(--accent); }
+.add-form { background: #1e2230; border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--border); display: none; }
+.add-form.show { display: block; }
+.batch-table input { width: 100px; padding: 6px; }
+.cbm-result { font-size: 1.3rem; font-weight: 700; color: var(--accent); margin-top: 12px; }
+.toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; align-items: center; }
+.file-input { display: none; }
 </style>
 </head>
 <body>
 <header>
-  <h1>文具<span>下單</span>系統</h1>
+  <h1>包裝物料<span>倉儲</span>管理</h1>
   <div class="tabs">
-    <button class="active" data-tab="order">下單</button>
-    <button data-tab="records">下單紀錄</button>
-    <button data-tab="status">狀態查詢</button>
+    <button class="active" data-tab="dashboard">Dashboard</button>
+    <button data-tab="materials">物料清單</button>
+    <button data-tab="count">盤點記錄</button>
+    <button data-tab="inbound">到倉記錄</button>
+    <button data-tab="usage">用量計算</button>
+    <button data-tab="cbm">CBM 計算</button>
+    <button data-tab="order">下單</button>
   </div>
-  <div class="login-info" id="loginInfo">
-    <span class="sync-status" id="syncStatus">同步中...</span>
-    <span id="loginStatus">未登入</span>
-    <button class="btn secondary" id="loginBtn" style="width:auto; padding:6px 12px; font-size:0.85rem">登入</button>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <span id="syncBadge" style="font-size:0.75rem;padding:2px 8px;border-radius:10px;background:#333;color:#888">未同步</span>
+    <span id="loginStatus" style="font-size:0.85rem;color:var(--muted)">未登入</span>
+    <button class="btn secondary sm" id="loginBtn">登入</button>
   </div>
 </header>
 
+<!-- Login Modal -->
+<div id="loginModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;align-items:center;justify-content:center;">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;width:320px;max-width:90%;">
+    <h3 style="margin-top:0">管理員登入</h3>
+    <label>密碼</label>
+    <input type="password" id="loginPwd" placeholder="輸入密碼" style="margin-bottom:12px">
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button class="btn secondary" id="loginCancel">取消</button>
+      <button class="btn" id="loginSubmit">登入</button>
+    </div>
+    <p style="font-size:0.75rem;color:var(--muted);margin-top:12px;margin-bottom:0">預設密碼：admin123</p>
+  </div>
+</div>
+
 <main>
-  <!-- Order Tab -->
-  <div id="tab-order">
-    <div class="order-layout">
-      <!-- Left Main Column -->
-      <div class="order-main-col">
-        <div class="section">
-          <h2 style="margin-top:0">下單資料</h2>
-          <div class="form-row">
-            <div>
-              <label>下單人姓名</label>
-              <input type="text" id="requester" placeholder="請輸入姓名">
-            </div>
-            <div>
-              <label>客戶</label>
-              <select id="department">
-                <option value="">請選擇</option>
-                <option>Office</option>
-                <option>Apple</option>
-                <option>Go Pro</option>
-                <option>Sennheiser</option>
-                <option>Sonova</option>
-                <option>Balluff</option>
-                <option>Lululemon</option>
-                <option>其他</option>
-              </select>
-            </div>
-            <div>
-              <label>下單日期</label>
-              <input type="date" id="orderDate">
-            </div>
-            <div>
-              <label>聯絡電話 / Email（選填）</label>
-              <input type="text" id="contact" placeholder="可選">
-            </div>
-          </div>
-          <div>
-            <label>備註</label>
-            <textarea id="notes" rows="2" placeholder="特殊要求或備註..."></textarea>
-          </div>
-        </div>
-
-        <div class="section">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:10px; flex-wrap:wrap;">
-            <div class="search-box" style="flex:1; margin:0; min-width:200px;">
-              <input type="text" id="search" placeholder="搜尋文具名稱...">
-            </div>
-            <button class="btn secondary" id="toggleAddItem" style="width:auto; padding:10px 16px;">＋ 新增文具</button>
-          </div>
-
-          <div class="add-item-form" id="addItemForm">
-            <h3 style="margin-top:0">新增文具項目</h3>
-            <div class="form-row">
-              <div>
-                <label>分類</label>
-                <select id="newCat"></select>
-              </div>
-              <div id="newCatCustomWrap" style="display:none">
-                <label>新分類名稱</label>
-                <input type="text" id="newCatCustom" placeholder="請輸入新分類名稱">
-              </div>
-              <div>
-                <label>名稱</label>
-                <input type="text" id="newName" placeholder="文具名稱">
-              </div>
-              <div>
-                <label>單位</label>
-                <input type="text" id="newUnit" placeholder="例如：Box、Piece">
-              </div>
-            </div>
-            <div class="form-row">
-              <div>
-                <label>產品連結（選填，預設為 Garret 產品頁）</label>
-                <input type="url" id="newLink" placeholder="https://www.garret.com.hk/product.php...">
-              </div>
-              <div>
-                <label>圖片網址（選填，可貼上 Garret 圖片連結）</label>
-                <input type="url" id="newImageUrl" placeholder="https://www.garret.com.hk/...">
-              </div>
-            </div>
-            <div style="margin:12px 0">
-              <label>或上傳本地商品圖片（若未填圖片網址則必填）</label>
-              <input type="file" id="newImage" accept="image/*">
-              <div id="imagePreview" style="margin-top:8px"></div>
-            </div>
-            <button class="btn" id="saveNewItem" style="margin-top:8px;">儲存新項目</button>
-          </div>
-
-          <div class="filters" id="categoryFilters"></div>
-          <div class="item-list" id="itemList"></div>
-        </div>
-      </div>
-
-      <!-- Right Sticky Column: Selected Items & Submit -->
-      <aside class="order-side-col">
-        <div class="side-card">
-          <h3>
-            <span>已選項目 (<span id="selectedCount">0</span>)</span>
-            <button class="btn secondary" id="clearCartBtn" style="width:auto; padding:4px 10px; font-size:0.8rem; display:none;">清空已選</button>
-          </h3>
-          <div id="sideEmpty" class="side-empty">尚未選擇任何文具項目<br>請在左側調整數量</div>
-          <div class="side-summary-list" id="summaryItems" style="display:none"></div>
-          <button class="btn" id="submitBtn">提交下單</button>
-        </div>
-      </aside>
+  <!-- Dashboard -->
+  <div id="tab-dashboard">
+    <div class="stat-grid" id="statGrid"></div>
+    <div class="section">
+      <h2 style="margin-top:0">庫存警示</h2>
+      <div id="alertList"></div>
+    </div>
+    <div class="section">
+      <h2 style="margin-top:0">資料管理</h2>
+      <p style="color:var(--muted)">一鍵清空所有盤點與到倉記錄（物料主檔保留）。</p>
+      <button class="btn danger" id="clearAllRecords">清空所有庫存紀錄</button>
     </div>
   </div>
 
-  <!-- Records Tab -->
-  <div id="tab-records" style="display:none">
+  <!-- Materials -->
+  <div id="tab-materials" style="display:none">
     <div class="section">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
-        <h2 style="margin:0">所有下單紀錄</h2>
-        <div style="display:flex; gap:8px; flex-wrap:wrap;">
-          <button class="btn secondary" id="refreshRecordsBtn" style="width:auto; padding:10px 16px">重新整理雲端資料</button>
-          <button class="btn secondary" id="exportBtn" style="width:auto; padding:10px 16px">匯出明細 CSV</button>
-          <button class="btn secondary" id="exportMonthBtn" style="width:auto; padding:10px 16px">匯出月份總計</button>
-          <button class="btn secondary" id="exportBackupBtn" style="width:auto; padding:10px 16px">匯出完整備份</button>
-          <button class="btn danger" id="clearBtn" style="width:auto; padding:10px 16px; display:none">清空所有紀錄</button>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
+        <h2 style="margin:0">物料清單</h2>
+        <div class="toolbar">
+          <button class="btn secondary" id="toggleAddMat">＋ 新增物料</button>
+          <button class="btn secondary" id="exportMatTemplate">下載物料範本 (XLSX)</button>
+          <button class="btn secondary" id="importMatBtn">導入物料清單 (XLSX)</button>
+          <input type="file" id="importMatFile" class="file-input" accept=".xlsx,.xls">
         </div>
       </div>
-      <div class="filter-bar">
-        <select id="monthFilter" style="width:auto">
-          <option value="all">全部月份</option>
-        </select>
-        <select id="deptFilter" style="width:auto">
-          <option value="all">全部客戶</option>
-          <option>Office</option>
-          <option>Apple</option>
-          <option>Go Pro</option>
-          <option>Sennheiser</option>
-          <option>Sonova</option>
-          <option>Balluff</option>
-          <option>Lululemon</option>
-          <option>其他</option>
-        </select>
-        <select id="statusFilter" style="width:auto">
-          <option value="all">全部狀態</option>
-          <option value="待下單">待下單</option>
-          <option value="已下單">已下單</option>
-          <option value="已到貨">已到貨</option>
-          <option value="已取消">已取消</option>
-        </select>
+      <div class="add-form" id="addMatForm">
+        <h3 style="margin-top:0">新增物料</h3>
+        <div class="form-row">
+          <div><label>物料#</label><input type="text" id="newId" placeholder="例如 BAG007"></div>
+          <div><label>SAP#</label><input type="text" id="newSap"></div>
+          <div><label>Description</label><input type="text" id="newName"></div>
+          <div><label>單位</label><input type="text" id="newUm" placeholder="pcs / Roll / Pallet"></div>
+          <div><label>供應商</label><input type="text" id="newSupplier" placeholder="例如 ChengDu"></div>
+          <div><label>供應商 Email</label><input type="email" id="newEmail" placeholder="supplier@example.com"></div>
+          <div><label>類型</label><select id="newType"><option>Carton Box</option><option>Bag</option><option>Label</option><option>Pallet</option><option>Tape</option><option>Others</option></select></div>
+          <div><label>Lead Time (天)</label><input type="number" id="newLead" value="14"></div>
+          <div><label>CBM / pcs</label><input type="number" id="newCbm" step="0.000001" placeholder="0.001"></div>
+          <div><label>Monthly Usage</label><input type="number" id="newUsage" value="0"></div>
+        </div>
+        <button class="btn" id="saveNewMat">儲存新物料</button>
       </div>
-
-      <div class="bulk-bar" id="bulkBar">
-        <span id="selectedCountText">已選 0 筆</span>
-        <select id="bulkStatus" style="width:auto">
-          <option value="">選擇新狀態...</option>
-          <option>待下單</option>
-          <option>已下單</option>
-          <option>已到貨</option>
-          <option>已取消</option>
-        </select>
-        <button class="btn secondary" id="bulkUpdateBtn" style="width:auto; padding:8px 16px">更新選取</button>
+      <div class="add-form" id="editMatForm">
+        <h3 style="margin-top:0">編輯物料</h3>
+        <input type="hidden" id="editId">
+        <div class="form-row">
+          <div><label>物料#</label><input type="text" id="editIdDisplay" disabled></div>
+          <div><label>SAP#</label><input type="text" id="editSap"></div>
+          <div><label>Description</label><input type="text" id="editName"></div>
+          <div><label>單位</label><input type="text" id="editUm"></div>
+          <div><label>供應商</label><input type="text" id="editSupplier"></div>
+          <div><label>供應商 Email</label><input type="email" id="editEmail"></div>
+          <div><label>類型</label><select id="editType"><option>Carton Box</option><option>Bag</option><option>Label</option><option>Pallet</option><option>Tape</option><option>Others</option></select></div>
+          <div><label>Lead Time (天)</label><input type="number" id="editLead"></div>
+          <div><label>CBM / pcs</label><input type="number" id="editCbm" step="0.000001"></div>
+          <div><label>Monthly Usage</label><input type="number" id="editUsage"></div>
+          <div><label>現有庫存</label><input type="number" id="editStock"></div>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn" id="saveEditMat">儲存修改</button>
+          <button class="btn secondary" id="cancelEditMat">取消</button>
+        </div>
       </div>
-
-      <div id="recordsList"></div>
+      <div class="filters" id="supplierFilters"></div>
+      <div id="materialList"></div>
     </div>
   </div>
 
-  <!-- Status Query Tab -->
-  <div id="tab-status" style="display:none">
+  <!-- Count -->
+  <div id="tab-count" style="display:none">
     <div class="section">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
-        <h2 style="margin:0">狀態查詢</h2>
-        <button class="btn secondary" id="refreshStatusBtn" style="width:auto; padding:10px 16px">重新整理雲端資料</button>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
+        <h2 style="margin:0">批量盤點輸入</h2>
+        <div class="toolbar">
+          <button class="btn secondary" id="exportCountList">匯出盤點清單 (XLSX)</button>
+          <button class="btn secondary" id="importCountBtn">導入盤點紀錄 (XLSX)</button>
+          <input type="file" id="importCountFile" class="file-input" accept=".xlsx,.xls">
+        </div>
       </div>
-      <div class="stat-grid" id="statGrid"></div>
-      <div class="filter-bar">
-        <select id="statusQueryFilter" style="width:auto">
-          <option value="all">全部狀態</option>
-          <option value="待下單">待下單</option>
-          <option value="已下單">已下單</option>
-          <option value="已到貨">已到貨</option>
-          <option value="已取消">已取消</option>
-        </select>
-        <select id="statusDeptFilter" style="width:auto">
-          <option value="all">全部部門</option>
-          <option>Office</option>
-          <option>Apple</option>
-          <option>Go Pro</option>
-          <option>Sennheiser</option>
-          <option>Sonova</option>
-          <option>Balluff</option>
-          <option>Lululemon</option>
-          <option>其他</option>
-        </select>
-        <select id="statusMonthFilter" style="width:auto">
-          <option value="all">全部月份</option>
-        </select>
+      <p style="color:var(--muted); margin-top:0">物料已依物料# A→Z 排序。可匯出 XLSX 現場點數後再導入。</p>
+      <div id="batchCountTable"></div>
+      <div style="margin-top:12px">
+        <label>位置（套用到本次所有）</label>
+        <input type="text" id="batchLoc" placeholder="例如 1AJ / Warehouse" style="max-width:300px; margin-bottom:10px">
       </div>
-      <div id="statusList"></div>
+      <button class="btn" id="saveBatchCount">儲存本次盤點</button>
+    </div>
+    <div class="section">
+      <h2 style="margin-top:0">歷史盤點</h2>
+      <div id="countList"></div>
+    </div>
+  </div>
+
+  <!-- Inbound -->
+  <div id="tab-inbound" style="display:none">
+    <div class="section">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
+        <h2 style="margin:0">新增到倉</h2>
+        <div class="toolbar">
+          <button class="btn secondary" id="importInboundBtn">導入到倉紀錄 (XLSX)</button>
+          <input type="file" id="importInboundFile" class="file-input" accept=".xlsx,.xls">
+        </div>
+      </div>
+      <div class="form-row">
+        <div><label>物料#</label><select id="inMat"></select></div>
+        <div><label>到倉數量</label><input type="number" id="inQty" min="0"></div>
+        <div><label>供應商</label><input type="text" id="inSupplier"></div>
+        <div><label>PO#</label><input type="text" id="inPO"></div>
+        <div><label>關聯下單（選填）</label><select id="inOrderId"><option value="">無</option></select></div>
+      </div>
+      <button class="btn success" id="saveInboundBtn">儲存到倉</button>
+    </div>
+    <div class="section">
+      <h2 style="margin-top:0">歷史到倉</h2>
+      <div id="inboundList"></div>
+    </div>
+  </div>
+
+  <!-- Usage -->
+  <div id="tab-usage" style="display:none">
+    <div class="section">
+      <h2 style="margin-top:0">用量計算</h2>
+      <div class="formula-box">
+        <strong>計算公式：</strong><br>
+        期間用量 = 期初庫存 + 期間到貨 − 期末庫存<br>
+        Monthly Usage = 期間用量 × 30 ÷ 相隔天數
+      </div>
+      <div class="form-row">
+        <div><label>選擇物料</label><select id="usageMat"></select></div>
+        <div><label>區間數量</label>
+          <select id="usageIntervals">
+            <option value="2">最近 2 個區間</option>
+            <option value="3" selected>最近 3 個區間</option>
+            <option value="4">最近 4 個區間</option>
+          </select>
+        </div>
+        <div style="align-self:end"><button class="btn warning" id="calcUsageBtn">計算</button></div>
+      </div>
+      <div id="usageResult"></div>
+    </div>
+  </div>
+
+  <!-- CBM -->
+  <div id="tab-cbm" style="display:none">
+    <div class="section">
+      <h2 style="margin-top:0">CBM 計算工具</h2>
+      <div class="form-row">
+        <div><label>選擇物料</label><select id="cbmMat"></select></div>
+        <div><label>數量</label><input type="number" id="cbmQty" value="1" min="1"></div>
+        <div style="align-self:end"><button class="btn" id="calcCbmBtn">計算 CBM</button></div>
+      </div>
+      <div id="cbmResult"></div>
+    </div>
+    <div class="section">
+      <h2 style="margin-top:0">現有庫存總 CBM</h2>
+      <div id="totalCbmList"></div>
+    </div>
+  </div>
+
+  <!-- Order -->
+  <div id="tab-order" style="display:none">
+    <div class="section">
+      <h2 style="margin-top:0">建立下單</h2>
+      <div class="form-row">
+        <div>
+          <label>供應商</label>
+          <select id="orderSupplier"></select>
+        </div>
+        <div>
+          <label>下單人</label>
+          <input type="text" id="orderPerson" placeholder="例如 Alfred Yeung" value="Alfred Yeung">
+        </div>
+        <div>
+          <label>客戶 / Project</label>
+          <input type="text" id="orderProject" placeholder="例如 Balluff" value="Balluff">
+        </div>
+        <div>
+          <label>到貨備註（選填）</label>
+          <input type="text" id="orderNote" placeholder="例如分2車到、急單等">
+        </div>
+      </div>
+      <div id="orderItemList" style="margin-top:12px"></div>
+      <button class="btn" id="generateOrderBtn" style="margin-top:12px">生成 Email</button>
+    <div class="section" id="orderResult" style="display:none">
+      <h3 style="margin-top:0">Email 草稿</h3>
+      <div class="form-row">
+        <div style="grid-column:1/-1">
+          <label>主旨</label>
+          <input type="text" id="emailSubject" readonly>
+        </div>
+        <div style="grid-column:1/-1">
+          <label>收件人</label>
+          <input type="text" id="emailTo" readonly>
+        </div>
+        <div style="grid-column:1/-1">
+          <label>內文</label>
+          <textarea id="emailBody" rows="10" readonly></textarea>
+        </div>
+      </div>
+      <div class="toolbar">
+        <button class="btn secondary" id="copyEmailBtn">複製內文</button>
+        <button class="btn" id="mailtoBtn">開啟郵件程式</button>
+      </div>
+    </div>
+    <div class="section">
+      <h2 style="margin-top:0">下單紀錄</h2>
+      <div id="orderHistory"></div>
     </div>
   </div>
 </main>
-
-<!-- Login Modal -->
-<div class="login-modal" id="loginModal">
-  <div class="login-box">
-    <h3 style="margin-top:0">管理員登入</h3>
-    <p style="color:var(--muted);font-size:0.9rem">登入後可更改狀態、刪除紀錄</p>
-    <div style="margin:16px 0">
-      <label>帳號</label>
-      <input type="text" id="loginUser" placeholder="admin" value="admin">
-    </div>
-    <div style="margin-bottom:16px">
-      <label>密碼</label>
-      <input type="password" id="loginPass" placeholder="請輸入密碼">
-    </div>
-    <div style="display:flex; gap:8px">
-      <button class="btn" id="doLoginBtn">登入</button>
-      <button class="btn secondary" id="cancelLoginBtn">取消</button>
-    </div>
-  </div>
-</div>
-
-<!-- Edit Item Media/Link Modal -->
-<div class="login-modal" id="editItemModal">
-  <div class="login-box">
-    <h3 style="margin-top:0">設定文具圖片與連結</h3>
-    <p id="editItemTitle" style="color:var(--accent);font-weight:600;margin-bottom:12px;"></p>
-    <input type="hidden" id="editItemId">
-    <div style="margin-bottom:12px">
-      <label>產品網頁連結（預設為 Garret 產品目錄）</label>
-      <input type="url" id="editItemLink" placeholder="https://www.garret.com.hk/product.php">
-    </div>
-    <div style="margin-bottom:12px">
-      <label>圖片網址（可從 Garret 網站右鍵「複製圖片位址」貼上）</label>
-      <input type="url" id="editItemImageUrl" placeholder="https://www.garret.com.hk/...">
-    </div>
-    <div style="margin-bottom:16px">
-      <label>或上傳本地圖片覆蓋</label>
-      <input type="file" id="editItemImageFile" accept="image/*">
-      <div id="editItemPreview" style="margin-top:8px"></div>
-    </div>
-    <div style="display:flex; gap:8px">
-      <button class="btn" id="saveEditItemBtn">儲存設定</button>
-      <button class="btn secondary" id="cancelEditItemBtn">取消</button>
-    </div>
-  </div>
-</div>
 
 <div class="toast" id="toast"></div>
 
 <script>
 // 請將下方網址替換為你的 Google Apps Script 部署網址（結尾為 /exec）
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbyh6SvbDl4hC4bPN8b_Mcg7_ox__PfmzdmFF_r40u5sppDH8egCK3M-EpnUtpsikUiT8A/exec';
-const GARRET_CATALOG_URL = 'https://www.garret.com.hk/product.php';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwDLydVvl4i3t84TqwxfYB73hQSSFL0mO4ZToiSsR8b6nQFX4lkUOLsMsn0F2P6RemkSA/exec';
 
-const DEFAULT_ITEMS = [
-  {"id":1,"category":"筆","name":"天鵝牌藍原子筆(10)","unit":"Box"},
-  {"id":2,"category":"筆","name":"天鵝牌黑原子筆(10)","unit":"Box"},
-  {"id":3,"category":"筆","name":"天鵝牌紅原子筆(10)","unit":"Box"},
-  {"id":4,"category":"筆","name":"天鵝牌按掣原子筆(藍)","unit":"Box"},
-  {"id":5,"category":"筆","name":"螢光筆(黃橙粉紅藍綠)","unit":"Piece"},
-  {"id":6,"category":"筆","name":"藍色MARKER(12)","unit":"Box"},
-  {"id":7,"category":"筆","name":"黑色MARKER(12)","unit":"Box"},
-  {"id":8,"category":"筆","name":"紅色MARKER(12)","unit":"Box"},
-  {"id":9,"category":"文具","name":"告事貼 1.5\" x 2\"","unit":"Pad"},
-  {"id":10,"category":"文具","name":"告事貼 3\" x 3\"","unit":"Pad"},
-  {"id":11,"category":"文具","name":"改錯帶","unit":"Piece"},
-  {"id":12,"category":"文具","name":"漿糊筆","unit":"Piece"},
-  {"id":13,"category":"文具","name":"擦膠","unit":"Piece"},
-  {"id":14,"category":"文具","name":"筆筒","unit":"Piece"},
-  {"id":15,"category":"文具","name":"#832181 釘書釘(5000 PCS)","unit":"Box"},
-  {"id":16,"category":"文具","name":"釘書機 HD-88R","unit":"Piece"},
-  {"id":17,"category":"文具","name":"起釘鉗","unit":"Piece"},
-  {"id":18,"category":"文具","name":"打孔機","unit":"Piece"},
-  {"id":19,"category":"文具","name":"鉛筆刨","unit":"Piece"},
-  {"id":20,"category":"文具","name":"大萬字夾","unit":"Box"},
-  {"id":21,"category":"文具","name":"細萬字夾","unit":"Box"},
-  {"id":22,"category":"文具","name":"Hius HR148 萬字夾盅","unit":"Piece"},
-  {"id":23,"category":"文具","name":"間尺","unit":"Piece"},
-  {"id":24,"category":"文具","name":"2吋橡筋","unit":"Bag"},
-  {"id":25,"category":"文具","name":"單夾板(黑)","unit":"Piece"},
-  {"id":26,"category":"文具","name":"1吋文件夾(黑)","unit":"Dozen"},
-  {"id":27,"category":"文具","name":"2吋文件夾(黑)","unit":"Dozen"},
-  {"id":28,"category":"文具","name":"膠紙","unit":"筒"},
-  {"id":29,"category":"文具","name":"膠紙座","unit":"Piece"},
-  {"id":30,"category":"文具","name":"油性雙面膠紙","unit":"Piece"},
-  {"id":31,"category":"文具","name":"計算機","unit":"Piece"},
-  {"id":32,"category":"文具","name":"兩層文件架","unit":"Piece"},
-  {"id":33,"category":"文具","name":"文件架駁腳(短鐵柱)","unit":"Pack"},
-  {"id":34,"category":"剪裁用品","name":"鐵鎅刀(細)","unit":"Piece"},
-  {"id":35,"category":"剪裁用品","name":"剪刀","unit":"Piece"},
-  {"id":36,"category":"剪裁用品","name":"大刀片(10片)","unit":"Piece"},
-  {"id":37,"category":"剪裁用品","name":"細刀片(10片)","unit":"Tube"},
-  {"id":38,"category":"剪裁用品","name":"大鎅刀","unit":"Piece"},
-  {"id":39,"category":"剪裁用品","name":"細鎅刀","unit":"Piece"},
-  {"id":40,"category":"剪裁用品","name":"A1 size 切割板","unit":"Piece"},
-  {"id":41,"category":"剪裁用品","name":"鐵膠紙機2吋","unit":"Piece"},
-  {"id":42,"category":"剪裁用品","name":"鐵膠紙機2.5吋","unit":"Piece"},
-  {"id":43,"category":"FILE","name":"FILE","unit":"Piece"},
-  {"id":44,"category":"FILE","name":"A4 膠FILE-透明","unit":"Piece"},
-  {"id":45,"category":"FILE","name":"A4 膠FILE-其他顏色(黃紅藍綠)","unit":"Piece"},
-  {"id":46,"category":"FILE","name":"硬皮文件夾3吋A4size","unit":"Piece"},
-  {"id":47,"category":"文具","name":"網紋拉鍊袋 - A4","unit":"Piece"},
-  {"id":48,"category":"簿","name":"紅黑面硬皮 (100頁) (6″ x 8″)","unit":"Piece"},
-  {"id":49,"category":"簿","name":"紅黑面硬皮簿 100頁 (8.5\" X 13\")","unit":"Piece"},
-  {"id":50,"category":"簿","name":"紅黑面硬皮簿 200頁 (8.5\" X 13\")","unit":"Piece"},
-  {"id":51,"category":"簿","name":"Gambol S5807 線圈記事簿 6″x8″-80p","unit":"Piece"},
-  {"id":52,"category":"白板類","name":"白版 60 x 90cm","unit":"Piece"},
-  {"id":53,"category":"白板類","name":"磁石貼 30mm (5粒)","unit":"Piece"},
-  {"id":54,"category":"白板類","name":"磁石片 210x297mm","unit":"Piece"},
-  {"id":55,"category":"白板類","name":"磁石掛勾","unit":"Piece"},
-  {"id":56,"category":"紙","name":"SUPREME 80gsm","unit":"Box"},
-  {"id":57,"category":"電池","name":"AA 電池 充電器","unit":"Piece"},
-  {"id":58,"category":"電池","name":"4粒裝2A叉電","unit":"Pack"},
-  {"id":59,"category":"電池","name":"4粒裝3A叉電","unit":"Pack"},
-  {"id":60,"category":"電/電池","name":"6位合格排插 + 4個USB充電器(黑色)","unit":"Piece"},
-  {"id":61,"category":"電/電池","name":"13A 萬能插蘇","unit":"Piece"},
-  {"id":62,"category":"Label","name":"顏色編碼標籤 1/2\" 圓形 12 mm 紅色","unit":"Pack"},
-  {"id":63,"category":"Label","name":"顏色編碼標籤 1/2\" 圓形 12 mm 藍色","unit":"Pack"},
-  {"id":64,"category":"Label","name":"Handel with care label","unit":"Pack"},
-  {"id":65,"category":"其他","name":"膠點手套","unit":"Dozen"},
-  {"id":66,"category":"其他","name":"勞工手套","unit":"Dozen"},
-  {"id":67,"category":"其他","name":"拉尺-5M","unit":"Piece"},
-  {"id":68,"category":"其他","name":"Blu Tack","unit":"Piece"},
-  {"id":69,"category":"其他","name":"A4 過膠片","unit":"Box"},
-  {"id":70,"category":"其他","name":"碎紙機專用機油(120ml)","unit":"Piece"},
-  {"id":71,"category":"其他","name":"索帶8\"*2.5MM 100條","unit":"Bag"},
-  {"id":72,"category":"墨水/印章","name":"藍色墨水","unit":"Bot"},
-  {"id":73,"category":"墨水/印章","name":"紅色墨水","unit":"Bot"},
-  {"id":74,"category":"墨水/印章","name":"日子印","unit":"Piece"},
-  {"id":75,"category":"清潔用品","name":"洗碗百潔布","unit":"Piece"},
-  {"id":76,"category":"清潔用品","name":"滴露消毒濕紙巾 20x17cm 80's","unit":"Can"},
-  {"id":77,"category":"藥品","name":"膠布","unit":"Box"},
-  {"id":78,"category":"藥品","name":"消毒火酒","unit":"Piece"}
+const DEFAULT_MATERIALS = [
+  {id:"MXL001", sap:"111431", name:"Material label 90x40mm", um:"Roll", supplier:"ChengDu", type:"Label", usage:3, lead:11, stock:6, cbm:0.00324, lastDate:"2026-11-26"},
+  {id:"ZLB001", sap:"153450", name:"Zip lock Bag (280x350/0.05mm)", um:"pcs", supplier:"ChengDu", type:"Bag", usage:0, lead:0, stock:8200, cbm:0, lastDate:"2026-11-26"},
+  {id:"PLC001", sap:"210269", name:"Paper PLT cover w/4 sides Logo (1200*800*970cm)", um:"pcs", supplier:"木林森", type:"Carton Box", usage:200, lead:18, stock:82, cbm:0.048462, lastDate:"2026-11-26"},
+  {id:"WHB001", sap:"619357", name:"白盒(細) 116x55x51", um:"pcs", supplier:"ChengDu", type:"Carton Box", usage:1000, lead:11, stock:5300, cbm:0.0001344, lastDate:"2026-11-26"},
+  {id:"BWB001", sap:"222151", name:"啡盒(size 1) 215x155x73", um:"pcs", supplier:"ChengDu", type:"Carton Box", usage:1200, lead:11, stock:4200, cbm:0.0005724, lastDate:"2026-11-26"},
+  {id:"BWB002", sap:"223205", name:"啡盒(size 2) 360x250x100", um:"pcs", supplier:"ChengDu", type:"Carton Box", usage:500, lead:17, stock:680, cbm:0.003003, lastDate:"2026-11-26"},
+  {id:"BWB003", sap:"223206", name:"啡盒(size 3) 550x350x100", um:"pcs", supplier:"ChengDu", type:"Carton Box", usage:46, lead:10, stock:340, cbm:0.0045105, lastDate:"2026-11-26"},
+  {id:"BWB004", sap:"223208", name:"啡盒(size 4) 550x350x160", um:"pcs", supplier:"ChengDu", type:"Carton Box", usage:34, lead:14, stock:234, cbm:0.005723, lastDate:"2026-11-26"},
+  {id:"WHB003", sap:"619361", name:"白盒(中) 143x81x74", um:"pcs", supplier:"ChengDu", type:"Carton Box", usage:691, lead:24, stock:700, cbm:0.0003264, lastDate:"2026-11-26"},
+  {id:"CTN001", sap:"619376", name:"Outer Box w/4sides Logo 64*47*43 cm", um:"pcs", supplier:"ChengDu", type:"Carton Box", usage:12, lead:0, stock:170, cbm:0.015984, lastDate:"2026-11-26"},
+  {id:"PLT001", sap:"PLT001", name:"Plywood PLT base (1200*800mm) with corners", um:"Pallet", supplier:"木林森", type:"Pallet", usage:150, lead:11, stock:96, cbm:0.144, lastDate:"2026-11-26"},
+  {id:"THA001", sap:"OTH001", name:"5\"機用打包帶", um:"Roll", supplier:"Arvato-Yannie", type:"Others", usage:3, lead:15, stock:7, cbm:0.03362, lastDate:"2026-11-26"},
+  {id:"LAB001", sap:"LAB002", name:"4\"(W) x 3\"(H)mm Direct Thermal Label", um:"Roll", supplier:"Arvato-Yannie", type:"Label", usage:14, lead:14, stock:27, cbm:0.002773547, lastDate:"2026-11-26"},
+  {id:"CTN002", sap:"CTN001", name:"新大紙箱 55*36*36 cm", um:"pcs", supplier:"木林森", type:"Carton Box", usage:45, lead:14, stock:75, cbm:0.0086359, lastDate:"2026-11-26"},
+  {id:"CTN003", sap:"CTN002", name:"新細紙箱 39*34*33 cm", um:"pcs", supplier:"木林森", type:"Carton Box", usage:35, lead:12, stock:435, cbm:0.0064532, lastDate:"2026-11-26"},
+  {id:"CTN004", sap:"CTN003", name:"長條紙箱 (101cm)", um:"pcs", supplier:"KN Migration", type:"Carton Box", usage:3, lead:0, stock:28, cbm:0.003175, lastDate:"2026-11-26"},
+  {id:"CTN005", sap:"CTN004", name:"長條紙箱 (180cm)", um:"pcs", supplier:"KN Migration", type:"Carton Box", usage:3, lead:0, stock:20, cbm:0.00515, lastDate:"2026-11-26"},
+  {id:"CTN006", sap:"CTN006", name:"AU Balluff box(55X55X31)", um:"pcs", supplier:"木林森", type:"Carton Box", usage:60, lead:8, stock:240, cbm:0.0121862, lastDate:"2026-11-26"},
+  {id:"BAG003", sap:"BAG003", name:"牛皮紙氣泡信封袋(41cm x 29cm)", um:"pcs", supplier:"Arvato-Yannie", type:"Bag", usage:250, lead:9, stock:4303, cbm:0.0005945, lastDate:"2026-11-26"},
+  {id:"BAG005", sap:"BAG005", name:"牛皮紙氣泡信封袋(26cm x 18cm)", um:"pcs", supplier:"Arvato-Yannie", type:"Bag", usage:400, lead:14, stock:15048, cbm:0.0003744, lastDate:"2026-11-26"},
+  {id:"BAG006", sap:"BAG006", name:"6\"x 8\" Paper bubble envelopes", um:"pcs", supplier:"Arvato-Yannie", type:"Bag", usage:0, lead:0, stock:0, cbm:0.00021, lastDate:"2026-11-26"},
+  {id:"OTH002", sap:"OTH002", name:"紙角", um:"pcs", supplier:"Arvato-Yannie", type:"Others", usage:40, lead:0, stock:540, cbm:0.000825, lastDate:"2026-11-26"},
+  {id:"OTH004", sap:"OTH004", name:"LLDPE Stretch Film - Clear (Hand)", um:"Roll", supplier:"Arvato-Yannie", type:"Others", usage:18, lead:7, stock:8, cbm:0.00518175, lastDate:"2026-11-26"},
+  {id:"LAB005", sap:"LAB005", name:"100(W) x 184.5(H)mm Direct Thermal Blank Label", um:"Roll", supplier:"Arvato-Yannie", type:"Label", usage:2, lead:29, stock:10, cbm:0.00256, lastDate:"2026-11-26"},
+  {id:"LAB006", sap:"LAB006", name:"100(W) x 50(H) mm Removable Label (PARTIAL)", um:"Roll", supplier:"Arvato-Yannie", type:"Label", usage:1, lead:10, stock:494, cbm:0.002816, lastDate:"2026-11-26"},
+  {id:"TAP001", sap:"TAP001", name:"兩吋啡皺紋膠紙 - 50mm x 20M", um:"Roll", supplier:"Arvato-Yannie", type:"Tape", usage:8, lead:14, stock:0, cbm:0.0005, lastDate:"2026-11-26"},
+  {id:"TAP002", sap:"TAP002", name:"Clear Tape 封箱膠紙", um:"Roll", supplier:"Arvato-Yannie", type:"Tape", usage:35, lead:12, stock:600, cbm:0.0005415, lastDate:"2026-11-26"},
+  {id:"PLT003", sap:"PLT003", name:"Plastic pallet from CTU (120x80)", um:"Pallet", supplier:"ChengDu", type:"Pallet", usage:6, lead:0, stock:130, cbm:0.0576, lastDate:"2026-11-26"}
 ];
 
-const DEPTS = ['Office', 'Apple', 'Go Pro', 'Sennheiser', 'Sonova', 'Balluff', 'Lululemon', '其他'];
-const STATUSES = ['待下單', '已下單', '已到貨', '已取消'];
-const ADMIN_USER = 'admin';
-const ADMIN_PASS = '1234';
+const SAMPLE_COUNTS = [
+  {id:1, date:"2026-11-26", mat:"BAG003", qty:4303, loc:"Warehouse"},
+  {id:2, date:"2026-11-26", mat:"BWB001", qty:4200, loc:"1AJ"},
+  {id:3, date:"2026-11-26", mat:"BWB002", qty:680, loc:"1AJ"},
+  {id:4, date:"2026-11-26", mat:"WHB001", qty:5300, loc:"1AJ"},
+  {id:5, date:"2026-11-26", mat:"PLT001", qty:96, loc:"1/F"},
+  {id:6, date:"2026-11-26", mat:"PLC001", qty:82, loc:"G/F"},
+  {id:7, date:"2026-11-26", mat:"OTH004", qty:8, loc:"Warehouse"},
+  {id:8, date:"2026-10-30", mat:"BAG003", qty:4365, loc:"Warehouse"},
+  {id:9, date:"2026-10-30", mat:"BWB001", qty:2950, loc:"1AJ"},
+  {id:10, date:"2026-09-30", mat:"BAG003", qty:4462, loc:"Warehouse"},
+  {id:11, date:"2026-09-15", mat:"BAG003", qty:4800, loc:"Warehouse"},
+  {id:12, date:"2026-08-31", mat:"BAG003", qty:0, loc:"Warehouse"}
+];
 
-let allItems = [];
-let cachedOrders = [];
-let cachedCustomItems = [];
-let quantities = {};
-let currentCategory = '全部';
-let searchTerm = '';
-let monthFilter = 'all';
-let deptFilter = 'all';
-let statusFilter = 'all';
-let statusQueryFilter = 'all';
-let statusDeptFilter = 'all';
-let statusMonthFilter = 'all';
-let isLoggedIn = false;
-let selectedIds = new Set();
+const SAMPLE_INBOUNDS = [
+  {id:1, date:"2026-09-06", mat:"BAG003", qty:5000, supplier:"Arvato-Yannie"},
+  {id:2, date:"2026-08-11", mat:"BAG005", qty:2000, supplier:"Arvato-Yannie"},
+  {id:3, date:"2026-10-29", mat:"BWB001", qty:3000, supplier:"ChengDu"},
+  {id:4, date:"2026-09-09", mat:"BWB001", qty:1500, supplier:"ChengDu"},
+  {id:5, date:"2026-10-29", mat:"BWB002", qty:2000, supplier:"ChengDu"},
+  {id:6, date:"2026-09-16", mat:"BWB002", qty:1500, supplier:"ChengDu"},
+  {id:7, date:"2026-09-09", mat:"WHB001", qty:2000, supplier:"ChengDu"},
+  {id:8, date:"2026-11-10", mat:"PLT001", qty:200, supplier:"木林森"},
+  {id:9, date:"2026-10-27", mat:"PLT001", qty:200, supplier:"木林森"}
+];
 
-function loadHiddenItemIds() {
-  try { return JSON.parse(localStorage.getItem('stationeryHiddenItemIds') || '[]'); }
-  catch { return []; }
-}
-function saveHiddenItemIds(ids) {
-  localStorage.setItem('stationeryHiddenItemIds', JSON.stringify(ids));
-}
-function loadItemOverrides() {
-  try { return JSON.parse(localStorage.getItem('stationeryItemOverrides') || '{}'); }
-  catch { return {}; }
-}
-function saveItemOverrides(map) {
-  localStorage.setItem('stationeryItemOverrides', JSON.stringify(map));
-}
+let materials = [], counts = [], inbounds = [], orders = [], currentSupplier = "全部";
+let nextCountId = 100, nextInboundId = 100, nextOrderId = 100;
 
-function setSyncBadge(text, state) {
-  const el = document.getElementById('syncStatus');
-  if (!el) return;
-  el.textContent = text;
-  el.className = 'sync-status' + (state ? ' ' + state : '');
+function getSortedMaterials() {
+  return [...materials].sort((a, b) => a.id.localeCompare(b.id));
 }
 
 function isGasConfigured() {
   return GAS_URL && !GAS_URL.includes('請貼上你的部署ID');
 }
 
+function setSyncBadge(text, state) {
+  const el = document.getElementById('syncBadge');
+  if (!el) return;
+  el.textContent = text;
+  el.style.background = state === 'ok' ? '#1a4d2e' : state === 'err' ? '#4d1a1a' : '#333';
+  el.style.color = state === 'ok' ? '#6ee7a0' : state === 'err' ? '#f87171' : '#888';
+}
+
 async function syncFromCloud(showToast = false) {
   if (!isGasConfigured()) {
-    setSyncBadge('尚未設定雲端網址', 'err');
+    setSyncBadge('尚未設定雲端', 'err');
     return;
   }
   setSyncBadge('同步中...', '');
@@ -629,21 +390,32 @@ async function syncFromCloud(showToast = false) {
     const res = await fetch(GAS_URL, { method: 'GET', cache: 'no-store' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
-    cachedOrders = Array.isArray(data.orders) ? data.orders : [];
-    cachedCustomItems = Array.isArray(data.customItems) ? data.customItems : [];
+    materials = Array.isArray(data.materials) ? data.materials : [];
+    counts = Array.isArray(data.counts) ? data.counts : [];
+    inbounds = Array.isArray(data.inbounds) ? data.inbounds : [];
+    orders = Array.isArray(data.orders) ? data.orders.map(parseOrder) : [];
+    counts.forEach(c => { if (!c.id) c.id = nextCountId++; });
+    inbounds.forEach(i => { if (!i.id) i.id = nextInboundId++; });
+    orders.forEach(o => { if (!o.id) o.id = nextOrderId++; });
+    recalcDerived();
     setSyncBadge('雲端已同步', 'ok');
-    if (showToast) toast('已從 Google Sheets 更新最新資料');
+    if (showToast) toast('已從 Google Sheets 更新');
   } catch (err) {
-    console.error('Sync from cloud failed:', err);
+    console.error('Sync failed:', err);
     setSyncBadge('雲端連線失敗', 'err');
-    if (showToast) toast('讀取雲端資料失敗，請檢查 GAS_URL 設定');
+    if (showToast) toast('讀取雲端失敗');
   }
 }
 
-async function apiPost(payload) {
-  if (!isGasConfigured()) {
-    throw new Error('尚未設定 GAS_URL');
+function parseOrder(o) {
+  if (typeof o.items === 'string') {
+    try { o.items = JSON.parse(o.items); } catch { o.items = []; }
   }
+  return o;
+}
+
+async function apiPost(payload) {
+  if (!isGasConfigured()) throw new Error('尚未設定 GAS_URL');
   setSyncBadge('儲存中...', '');
   const res = await fetch(GAS_URL, {
     method: 'POST',
@@ -652,941 +424,718 @@ async function apiPost(payload) {
   });
   if (!res.ok) throw new Error('HTTP ' + res.status);
   const result = await res.json();
-  if (result && result.ok === false) {
-    throw new Error(result.error || '雲端寫入失敗');
-  }
+  if (result && result.ok === false) throw new Error(result.error || '寫入失敗');
   setSyncBadge('雲端已同步', 'ok');
   return result;
 }
 
-function loadCustomItems() {
-  return cachedCustomItems;
+async function saveData() {
+  try {
+    await apiPost({ action: 'saveAll', data: { materials, counts, inbounds, orders } });
+  } catch (err) {
+    console.error('Save failed:', err);
+    setSyncBadge('儲存失敗', 'err');
+    toast('雲端儲存失敗');
+  }
 }
-function saveCustomItems(items) {
-  cachedCustomItems = items;
+
+async function loadData() {
+  await syncFromCloud(false);
+  if (!materials.length && isGasConfigured()) {
+    materials = DEFAULT_MATERIALS.map(m => ({...m}));
+    counts = SAMPLE_COUNTS.map(c => ({...c}));
+    inbounds = SAMPLE_INBOUNDS.map(i => ({...i}));
+    orders = [];
+    recalcDerived();
+    await saveData();
+    toast('已初始化預設資料');
+  }
 }
-function getAllItems() {
-  const hiddenSet = new Set(loadHiddenItemIds().map(Number));
-  const overrides = loadItemOverrides();
-  const base = DEFAULT_ITEMS.map(item => {
-    const ov = overrides[item.id] || {};
-    return {
-      ...item,
-      image: ov.image !== undefined ? ov.image : (item.image || ''),
-      link: ov.link !== undefined ? ov.link : (item.link || GARRET_CATALOG_URL)
-    };
+function recalcDerived() {
+  materials.forEach(m => {
+    m.max = Math.ceil((m.usage||0) * 1.5);
+    m.min = Math.ceil((m.usage||0) * 0.75);
+    m.safety = Math.ceil((m.usage||0) * (m.lead||0) / 30 + (m.usage||0) * 0.3);
+    if ((m.stock||0) <= m.safety) m.status = "Critical";
+    else if ((m.stock||0) <= m.min) m.status = "Low";
+    else m.status = "OK";
   });
-  const custom = loadCustomItems().map(item => {
-    const ov = overrides[item.id] || {};
-    return {
-      ...item,
-      image: ov.image !== undefined ? ov.image : (item.image || ''),
-      link: ov.link !== undefined ? ov.link : (item.link || GARRET_CATALOG_URL)
-    };
-  });
-  return [...base, ...custom].filter(item => !hiddenSet.has(Number(item.id)));
 }
-
-function loadOrders() {
-  return cachedOrders;
-}
-function saveOrders(orders) {
-  cachedOrders = orders;
-}
-
-function getMonthKey(dateStr) {
-  if (!dateStr) return '未知月份';
-  return dateStr.slice(0, 7);
-}
-
 function toast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2200);
 }
+function switchTab(tab) {
+  document.querySelectorAll(".tabs button").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
+  ["dashboard","materials","count","inbound","usage","cbm","order"].forEach(t => {
+    document.getElementById("tab-" + t).style.display = t === tab ? "block" : "none";
+  });
+  // Re-sync from cloud when switching tabs (same as stationery system)
+  syncFromCloud(false).then(() => {
+    if (tab === "dashboard") renderDashboard();
+    if (tab === "materials") renderMaterials();
+    if (tab === "count") renderBatchCount();
+    if (tab === "inbound") { renderInbounds(); fillOrderSelect(); }
+    if (tab === "usage") fillMatSelects();
+    if (tab === "cbm") renderCbm();
+    if (tab === "order") { renderOrder(); renderOrderHistory(); }
+  });
+}
+function renderDashboard() {
+  const total = materials.length;
+  const critical = materials.filter(m => m.status === "Critical").length;
+  const low = materials.filter(m => m.status === "Low").length;
+  const ok = materials.filter(m => m.status === "OK").length;
+  const totalCbm = materials.reduce((s, m) => s + (m.stock||0) * (m.cbm||0), 0);
+  document.getElementById("statGrid").innerHTML = `
+    <div class="stat-card"><div class="num">${total}</div><div class="label">總物料</div></div>
+    <div class="stat-card stat-critical"><div class="num">${critical}</div><div class="label">Critical</div></div>
+    <div class="stat-card stat-low"><div class="num">${low}</div><div class="label">Low</div></div>
+    <div class="stat-card stat-ok"><div class="num">${ok}</div><div class="label">OK</div></div>
+    <div class="stat-card"><div class="num">${totalCbm.toFixed(1)}</div><div class="label">總 CBM</div></div>`;
+  const alerts = materials.filter(m => m.status === "Critical" || m.status === "Low");
+  document.getElementById("alertList").innerHTML = alerts.length === 0 ? '<div class="empty">目前無警示</div>'
+    : `<table><tr><th>物料#</th><th>Description</th><th>現有庫存</th><th>Safety</th><th>狀態</th><th>建議</th></tr>` +
+      alerts.map(m => {
+        const hasOpenOrder = orders.some(o => o.status !== "已完成" && o.items.some(i => i.id === m.id));
+        const suggestion = hasOpenOrder
+          ? `<span style="background:#4f8cff22;color:#4f8cff;padding:2px 8px;border-radius:4px;font-weight:600">已下單</span>`
+          : (m.status === "Critical" ? "立即下單" : "建議補貨");
+        return `<tr><td>${m.id}</td><td>${m.name}</td><td>${(m.stock||0).toLocaleString()}</td><td>${m.safety.toLocaleString()}</td><td class="status-${m.status}">${m.status}</td><td>${suggestion}</td></tr>`;
+      }).join("") + "</table>";
+}
+function renderMaterials() {
+  const suppliers = ["全部", ...new Set(materials.map(m => m.supplier))];
+  document.getElementById("supplierFilters").innerHTML = suppliers.map(s => `<button class="${currentSupplier===s?'active':''}" data-s="${s}">${s}</button>`).join("");
+  document.querySelectorAll("#supplierFilters button").forEach(btn => btn.onclick = () => { currentSupplier = btn.dataset.s; renderMaterials(); });
+  const filtered = currentSupplier === "全部" ? getSortedMaterials() : getSortedMaterials().filter(m => m.supplier === currentSupplier);
+  document.getElementById("materialList").innerHTML = `<table><tr><th>物料#</th><th>Description</th><th>單位</th><th>類型</th><th>供應商</th><th>Email</th><th>Usage</th><th>庫存</th><th>Safety</th><th>CBM/pcs</th><th>狀態</th><th></th></tr>` +
+    filtered.map(m => `<tr><td>${m.id}</td><td>${m.name}</td><td>${m.um||''}</td><td>${m.type||''}</td><td>${m.supplier}</td><td>${m.email||''}</td><td>${(m.usage||0).toLocaleString()}</td><td>${(m.stock||0).toLocaleString()}</td><td>${m.safety.toLocaleString()}</td><td>${(m.cbm||0).toFixed(6)}</td><td class="status-${m.status}">${m.status}</td><td><button class="btn secondary sm" data-edit-mat="${m.id}">編輯</button> <button class="btn danger sm" data-del-mat="${m.id}">刪除</button></td></tr>`).join("") + "</table>";
+  document.querySelectorAll("[data-del-mat]").forEach(btn => {
+    btn.onclick = () => {
+      if (!requireLogin()) return;
+      const id = btn.dataset.delMat;
+      if (!confirm("確定刪除物料 " + id + "？")) return;
+      materials = materials.filter(m => m.id !== id);
+      saveData();
+      toast("已刪除物料 " + id);
+      renderMaterials();
+    };
+  });
+  document.querySelectorAll("[data-edit-mat]").forEach(btn => {
+    btn.onclick = () => {
+      if (!requireLogin()) return;
+      openEditMaterial(btn.dataset.editMat);
+    };
+  });
+}
+function fillMatSelects() {
+  const opts = getSortedMaterials().map(m => `<option value="${m.id}">${m.id} - ${m.name}</option>`).join("");
+  ["inMat","usageMat","cbmMat"].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = opts; });
+}
+function renderBatchCount() {
+  fillMatSelects();
+  const sorted = getSortedMaterials();
+  document.getElementById("batchCountTable").innerHTML = `
+    <table class="batch-table"><tr><th>物料#</th><th>Description</th><th>單位</th><th>現有庫存</th><th>本次盤點數量</th></tr>
+    ${sorted.map(m => `<tr><td>${m.id}</td><td>${m.name}</td><td>${m.um||''}</td><td>${(m.stock||0).toLocaleString()}</td><td><input type="number" min="0" data-mat="${m.id}" placeholder=""></td></tr>`).join("")}
+    </table>`;
+  const hist = [...counts].sort((a,b) => b.date.localeCompare(a.date) || b.id - a.id).slice(0, 100);
+  document.getElementById("countList").innerHTML = hist.length === 0 ? '<div class="empty">尚無盤點記錄</div>'
+    : `<table><tr><th>日期</th><th>物料#</th><th>數量</th><th>位置</th><th></th></tr>` +
+      hist.map(c => `<tr><td>${c.date}</td><td>${c.mat}</td><td>${c.qty.toLocaleString()}</td><td>${c.loc||''}</td><td><button class="btn danger sm" data-del-count="${c.id}">刪除</button></td></tr>`).join("") + "</table>";
+  document.querySelectorAll("[data-del-count]").forEach(btn => {
+    btn.onclick = () => {
+      const id = +btn.dataset.delCount;
+      if (!confirm("確定刪除此筆盤點記錄？")) return;
+      counts = counts.filter(c => c.id !== id);
+      saveData();
+      toast("已刪除盤點記錄");
+      renderBatchCount();
+    };
+  });
+}
+function renderInbounds() {
+  fillMatSelects();
+  const sorted = [...inbounds].sort((a,b) => b.date.localeCompare(a.date) || b.id - a.id).slice(0, 100);
+  document.getElementById("inboundList").innerHTML = sorted.length === 0 ? '<div class="empty">尚無到倉記錄</div>'
+    : `<table><tr><th>到倉日</th><th>物料#</th><th>數量</th><th>供應商</th><th>關聯下單</th><th></th></tr>` +
+      sorted.map(i => `<tr><td>${i.date}</td><td>${i.mat}</td><td>${i.qty.toLocaleString()}</td><td>${i.supplier||''}</td><td>${i.orderId ? '#'+i.orderId : ''}</td><td><button class="btn danger sm" data-del-in="${i.id}">刪除</button></td></tr>`).join("") + "</table>";
+  document.querySelectorAll("[data-del-in]").forEach(btn => {
+    btn.onclick = () => {
+      const id = +btn.dataset.delIn;
+      if (!confirm("確定刪除此筆到倉記錄？")) return;
+      const inbound = inbounds.find(x => x.id === id);
+      if (inbound) {
+        // Reverse stock
+        const m = materials.find(x => x.id === inbound.mat);
+        if (m) m.stock = Math.max(0, (m.stock||0) - inbound.qty);
+
+        // Reverse order received qty and status
+        if (inbound.orderId) {
+          const order = orders.find(o => String(o.id) === String(inbound.orderId));
+          if (order) {
+            const item = order.items.find(i => i.id === inbound.mat);
+            if (item) {
+              item.received = Math.max(0, (item.received||0) - inbound.qty);
+              const allDone = order.items.every(i => (i.received||0) >= i.qty);
+              const anyReceived = order.items.some(i => (i.received||0) > 0);
+              order.status = allDone ? "已完成" : anyReceived ? "部分到貨" : "待到貨";
+            }
+          }
+        }
+      }
+      inbounds = inbounds.filter(x => x.id !== id);
+      recalcDerived();
+      saveData();
+      toast("已刪除到倉記錄，庫存與下單狀態已更新");
+      renderInbounds();
+    };
+  });
+}
+function renderCbm() {
+  fillMatSelects();
+  const rows = getSortedMaterials().filter(m => m.cbm > 0).map(m => {
+    const cbm = (m.stock||0) * m.cbm;
+    return `<tr><td>${m.id}</td><td>${m.name}</td><td>${(m.stock||0).toLocaleString()}</td><td>${m.cbm.toFixed(6)}</td><td>${cbm.toFixed(3)}</td></tr>`;
+  }).join("");
+  const total = materials.reduce((s, m) => s + (m.stock||0) * (m.cbm||0), 0);
+  document.getElementById("totalCbmList").innerHTML = `<table><tr><th>物料#</th><th>Description</th><th>庫存</th><th>CBM/pcs</th><th>總 CBM</th></tr>${rows}<tr><td colspan="4" style="text-align:right;font-weight:700">合計</td><td style="font-weight:700;color:var(--accent)">${total.toFixed(2)}</td></tr></table>`;
+}
+
+function exportCountList() {
+  const sorted = getSortedMaterials();
+  const data = [["物料#", "Description", "單位", "現有庫存", "本次盤點數量", "位置"]];
+  sorted.forEach(m => data.push([m.id, m.name, m.um||"", m.stock||0, "", ""]));
+  const ws = XLSX.utils.aoa_to_sheet(data);
+  ws["!cols"] = [{wch:12},{wch:45},{wch:10},{wch:12},{wch:14},{wch:15}];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "盤點清單");
+  XLSX.writeFile(wb, `盤點清單_${new Date().toISOString().slice(0,10)}.xlsx`);
+  toast("已匯出盤點清單 (XLSX)");
+}
+
+function importCountsFromFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const wb = XLSX.read(e.target.result, {type: "array"});
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, {header: 1});
+      let imported = 0;
+      const today = new Date().toISOString().slice(0,10);
+      for (let i = 1; i < rows.length; i++) {
+        const r = rows[i];
+        if (!r || !r[0]) continue;
+        const mat = String(r[0]).trim().toUpperCase();
+        const qty = parseInt(r[4]);
+        const loc = r[5] ? String(r[5]).trim() : "";
+        const date = r[6] ? String(r[6]).slice(0,10) : today;
+        if (!mat || isNaN(qty) || qty < 0) continue;
+        if (!materials.some(m => m.id === mat)) continue;
+        counts.push({id: nextCountId++, date, mat, qty, loc});
+        const m = materials.find(x => x.id === mat);
+        if (m) { m.stock = qty; m.lastDate = date; }
+        imported++;
+      }
+      if (imported === 0) return toast("未找到有效盤點資料（請確認「本次盤點數量」欄有數字）");
+      recalcDerived(); saveData();
+      toast(`已導入 ${imported} 筆盤點記錄`);
+      renderBatchCount();
+    } catch (err) {
+      toast("導入失敗：" + err.message);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function importInboundsFromFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const wb = XLSX.read(e.target.result, {type: "array"});
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, {header: 1});
+      let imported = 0;
+      for (let i = 1; i < rows.length; i++) {
+        const r = rows[i];
+        if (!r || !r[0]) continue;
+        const date = r[0] ? String(r[0]).slice(0,10) : "";
+        const mat = String(r[1] || "").trim().toUpperCase();
+        const qty = parseInt(r[2]);
+        const supplier = r[3] ? String(r[3]).trim() : "";
+        if (!date || !mat || isNaN(qty) || qty <= 0) continue;
+        if (!materials.some(m => m.id === mat)) continue;
+        inbounds.push({id: nextInboundId++, date, mat, qty, supplier});
+        const m = materials.find(x => x.id === mat);
+        if (m) m.stock = (m.stock||0) + qty;
+        imported++;
+      }
+      if (imported === 0) return toast("未找到有效到倉資料（欄位：日期, 物料#, 數量, 供應商）");
+      recalcDerived(); saveData();
+      toast(`已導入 ${imported} 筆到倉記錄`);
+      renderInbounds();
+    } catch (err) {
+      toast("導入失敗：" + err.message);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+document.getElementById("toggleAddMat").onclick = () => {
+  if (!requireLogin()) return;
+  document.getElementById("addMatForm").classList.toggle("show");
+};
+document.getElementById("saveNewMat").onclick = () => {
+  const id = document.getElementById("newId").value.trim().toUpperCase();
+  const name = document.getElementById("newName").value.trim();
+  if (!id || !name) return toast("請填寫物料# 與 Description");
+  if (materials.some(m => m.id === id)) return toast("物料# 已存在");
+  materials.push({
+    id, sap: document.getElementById("newSap").value.trim(), name,
+    um: document.getElementById("newUm").value.trim() || "pcs",
+    supplier: document.getElementById("newSupplier").value.trim(),
+    email: document.getElementById("newEmail").value.trim(),
+    type: document.getElementById("newType").value,
+    usage: parseInt(document.getElementById("newUsage").value) || 0,
+    lead: parseInt(document.getElementById("newLead").value) || 0,
+    stock: 0, cbm: parseFloat(document.getElementById("newCbm").value) || 0,
+    lastDate: ""
+  });
+  recalcDerived(); saveData();
+  ["newId","newSap","newName","newUm","newSupplier","newEmail","newCbm","newUsage"].forEach(id => document.getElementById(id).value = "");
+  document.getElementById("addMatForm").classList.remove("show");
+  toast("已新增物料 " + id);
+  renderMaterials();
+};
+
+function openEditMaterial(id) {
+  const m = materials.find(x => x.id === id);
+  if (!m) return;
+  document.getElementById("editId").value = m.id;
+  document.getElementById("editIdDisplay").value = m.id;
+  document.getElementById("editSap").value = m.sap || "";
+  document.getElementById("editName").value = m.name || "";
+  document.getElementById("editUm").value = m.um || "";
+  document.getElementById("editSupplier").value = m.supplier || "";
+  document.getElementById("editEmail").value = m.email || "";
+  document.getElementById("editType").value = m.type || "Others";
+  document.getElementById("editLead").value = m.lead || 0;
+  document.getElementById("editCbm").value = m.cbm || 0;
+  document.getElementById("editUsage").value = m.usage || 0;
+  document.getElementById("editStock").value = m.stock || 0;
+  document.getElementById("editMatForm").classList.add("show");
+  document.getElementById("addMatForm").classList.remove("show");
+  document.getElementById("editMatForm").scrollIntoView({behavior: "smooth"});
+}
+
+document.getElementById("saveEditMat").onclick = () => {
+  const id = document.getElementById("editId").value;
+  const m = materials.find(x => x.id === id);
+  if (!m) return;
+  m.sap = document.getElementById("editSap").value.trim();
+  m.name = document.getElementById("editName").value.trim();
+  m.um = document.getElementById("editUm").value.trim();
+  m.supplier = document.getElementById("editSupplier").value.trim();
+  m.email = document.getElementById("editEmail").value.trim();
+  m.type = document.getElementById("editType").value;
+  m.lead = parseInt(document.getElementById("editLead").value) || 0;
+  m.cbm = parseFloat(document.getElementById("editCbm").value) || 0;
+  m.usage = parseInt(document.getElementById("editUsage").value) || 0;
+  m.stock = parseInt(document.getElementById("editStock").value) || 0;
+  recalcDerived(); saveData();
+  document.getElementById("editMatForm").classList.remove("show");
+  toast("已更新物料 " + id);
+  renderMaterials();
+};
+
+document.getElementById("cancelEditMat").onclick = () => {
+  document.getElementById("editMatForm").classList.remove("show");
+};
+document.getElementById("saveBatchCount").onclick = () => {
+  const loc = document.getElementById("batchLoc").value.trim();
+  const today = new Date().toISOString().slice(0,10);
+  let updated = 0;
+  document.querySelectorAll("#batchCountTable input[data-mat]").forEach(inp => {
+    const qty = parseInt(inp.value);
+    if (!isNaN(qty) && qty >= 0) {
+      const mat = inp.dataset.mat;
+      counts.push({id: nextCountId++, date: today, mat, qty, loc});
+      const m = materials.find(x => x.id === mat);
+      if (m) { m.stock = qty; m.lastDate = today; }
+      updated++;
+    }
+  });
+  if (updated === 0) return toast("請至少輸入一個數量");
+  recalcDerived(); saveData();
+  toast(`已更新 ${updated} 個物料的盤點`);
+  renderBatchCount();
+};
+document.getElementById("saveInboundBtn").onclick = () => {
+  const mat = document.getElementById("inMat").value;
+  const qty = parseInt(document.getElementById("inQty").value);
+  if (!mat || isNaN(qty)) return toast("請填寫物料與數量");
+  const today = new Date().toISOString().slice(0,10);
+  const orderId = document.getElementById("inOrderId").value || "";
+  const supplier = document.getElementById("inSupplier").value.trim();
+  inbounds.push({id: nextInboundId++, date: today, mat, qty, supplier, orderId});
+  const m = materials.find(x => x.id === mat);
+  if (m) m.stock = (m.stock||0) + qty;
+
+  // Update related order received qty
+  if (orderId) {
+    const order = orders.find(o => String(o.id) === orderId);
+    if (order) {
+      const item = order.items.find(i => i.id === mat);
+      if (item) {
+        item.received = (item.received || 0) + qty;
+        const allDone = order.items.every(i => (i.received||0) >= i.qty);
+        const anyReceived = order.items.some(i => (i.received||0) > 0);
+        order.status = allDone ? "已完成" : anyReceived ? "部分到貨" : "待到貨";
+      }
+    }
+  }
+
+  recalcDerived(); saveData();
+  document.getElementById("inQty").value = "";
+  toast("到倉已儲存");
+  renderInbounds();
+};
+document.getElementById("calcUsageBtn").onclick = () => {
+  const matId = document.getElementById("usageMat").value;
+  const n = parseInt(document.getElementById("usageIntervals").value);
+  const matCounts = counts.filter(c => c.mat === matId).sort((a,b) => a.date.localeCompare(b.date));
+  const matIn = inbounds.filter(i => i.mat === matId);
+  if (matCounts.length < 2) {
+    document.getElementById("usageResult").innerHTML = '<div class="empty">此物料盤點記錄不足（至少需要 2 次）</div>';
+    return;
+  }
+  const intervals = [];
+  for (let i = Math.max(0, matCounts.length - n - 1); i < matCounts.length - 1; i++) {
+    const start = matCounts[i], end = matCounts[i+1];
+    const days = Math.round((new Date(end.date) - new Date(start.date)) / 86400000);
+    if (days <= 0) continue;
+    const inboundQty = matIn.filter(ib => ib.date > start.date && ib.date <= end.date).reduce((s, ib) => s + ib.qty, 0);
+    const periodUsage = start.qty + inboundQty - end.qty;
+    const monthly = Math.round(periodUsage * 30 / days);
+    intervals.push({start: start.date, end: end.date, startQty: start.qty, endQty: end.qty, inbound: inboundQty, period: periodUsage, days, monthly});
+  }
+  const avg = intervals.length ? Math.round(intervals.reduce((s,x) => s + x.monthly, 0) / intervals.length) : 0;
+  document.getElementById("usageResult").innerHTML = `
+    <h3>計算結果（${matId}）</h3>
+    <table><tr><th>區間</th><th>期初</th><th>期末</th><th>期間到貨</th><th>期間用量</th><th>天數</th><th>Monthly</th></tr>
+    ${intervals.map(iv => `<tr><td>${iv.start} → ${iv.end}</td><td>${iv.startQty.toLocaleString()}</td><td>${iv.endQty.toLocaleString()}</td><td>${iv.inbound.toLocaleString()}</td><td>${iv.period.toLocaleString()}</td><td>${iv.days}</td><td><strong>${iv.monthly.toLocaleString()}</strong></td></tr>`).join("")}</table>
+    <div style="margin-top:16px;font-size:1.1rem">平均 Monthly Usage：<strong style="color:var(--accent);font-size:1.4rem">${avg.toLocaleString()}</strong></div>
+    <button class="btn secondary" id="applyUsageBtn" style="margin-top:12px">套用到物料清單</button>`;
+  document.getElementById("applyUsageBtn").onclick = () => {
+    const m = materials.find(x => x.id === matId);
+    if (m) { m.usage = avg; recalcDerived(); saveData(); toast("已更新 Monthly Usage 為 " + avg); }
+  };
+};
+document.getElementById("calcCbmBtn").onclick = () => {
+  const matId = document.getElementById("cbmMat").value;
+  const qty = parseInt(document.getElementById("cbmQty").value) || 0;
+  const m = materials.find(x => x.id === matId);
+  if (!m) return;
+  const cbm = qty * (m.cbm || 0);
+  document.getElementById("cbmResult").innerHTML = `
+    <div class="formula-box">
+      ${m.name}<br>
+      CBM / pcs = ${ (m.cbm||0).toFixed(6) }<br>
+      數量 = ${qty.toLocaleString()}<br>
+      <div class="cbm-result">總 CBM = ${cbm.toFixed(4)}</div>
+    </div>`;
+};
+
+function exportMatTemplate() {
+  const data = [[
+    "物料#", "SAP#", "Description", "單位", "供應商", "Email",
+    "類型", "Lead Time", "CBM/pcs", "Monthly Usage", "現有庫存"
+  ]];
+  data.push(["BAG007", "BAG007", "範例信封袋", "pcs", "Arvato-Yannie", "order@example.com", "Bag", 14, 0.0005, 100, 0]);
+  const ws = XLSX.utils.aoa_to_sheet(data);
+  ws["!cols"] = [{wch:12},{wch:12},{wch:40},{wch:10},{wch:16},{wch:24},{wch:14},{wch:12},{wch:12},{wch:14},{wch:12}];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "物料範本");
+  XLSX.writeFile(wb, "物料清單範本.xlsx");
+  toast("已下載物料範本");
+}
+
+function importMaterialsFromFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const wb = XLSX.read(e.target.result, {type: "array"});
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, {header: 1});
+      let added = 0, updated = 0;
+      for (let i = 1; i < rows.length; i++) {
+        const r = rows[i];
+        if (!r || !r[0]) continue;
+        const id = String(r[0]).trim().toUpperCase();
+        const name = String(r[2] || "").trim();
+        if (!id || !name) continue;
+        const mat = {
+          id,
+          sap: String(r[1] || "").trim(),
+          name,
+          um: String(r[3] || "pcs").trim(),
+          supplier: String(r[4] || "").trim(),
+          email: String(r[5] || "").trim(),
+          type: String(r[6] || "Others").trim(),
+          lead: parseInt(r[7]) || 0,
+          cbm: parseFloat(r[8]) || 0,
+          usage: parseInt(r[9]) || 0,
+          stock: parseInt(r[10]) || 0,
+          lastDate: ""
+        };
+        const exist = materials.find(m => m.id === id);
+        if (exist) {
+          Object.assign(exist, mat);
+          updated++;
+        } else {
+          materials.push(mat);
+          added++;
+        }
+      }
+      if (added + updated === 0) return toast("未找到有效物料資料（請確認第一欄為物料#）");
+      recalcDerived();
+      saveData();
+      toast(`已導入：新增 ${added} 筆，更新 ${updated} 筆`);
+      renderMaterials();
+    } catch (err) {
+      toast("導入失敗：" + err.message);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+document.getElementById("exportMatTemplate").onclick = exportMatTemplate;
+document.getElementById("importMatBtn").onclick = () => {
+  if (!requireLogin()) return;
+  document.getElementById("importMatFile").click();
+};
+document.getElementById("importMatFile").onchange = e => {
+  if (e.target.files[0]) importMaterialsFromFile(e.target.files[0]);
+  e.target.value = "";
+};
+document.getElementById("exportCountList").onclick = exportCountList;
+document.getElementById("importCountBtn").onclick = () => document.getElementById("importCountFile").click();
+document.getElementById("importCountFile").onchange = e => {
+  if (e.target.files[0]) importCountsFromFile(e.target.files[0]);
+  e.target.value = "";
+};
+document.getElementById("importInboundBtn").onclick = () => document.getElementById("importInboundFile").click();
+document.getElementById("importInboundFile").onchange = e => {
+  if (e.target.files[0]) importInboundsFromFile(e.target.files[0]);
+  e.target.value = "";
+};
+document.getElementById("clearAllRecords").onclick = () => {
+  if (!requireLogin()) return;
+  if (!confirm("確定清空所有盤點與到倉記錄？此操作無法復原。\n（物料主檔會保留）")) return;
+  counts = [];
+  inbounds = [];
+  orders = [];
+  materials.forEach(m => { m.stock = 0; m.lastDate = ""; });
+  recalcDerived();
+  saveData();
+  toast("已清空所有庫存紀錄");
+  renderDashboard();
+};
+const SUPPLIER_TEMPLATES = {
+  "ChengDu": {
+    to: "Cheng.Luo@balluff.de; tina.zhang@balluff.com.cn",
+    cc: "balluff.opshk@arvato.com",
+    subject: date => `Balluff packing material order - ${date}`,
+    body: (items, person, note) => {
+      const lines = items.map(i => `${i.qty}pcs of ${i.sap || i.id}`);
+      return `Dear All\n\nPlease help to order the packing material – \n${lines.join(" and ")}\n\n${note ? note + "\n\n" : ""}Best regards,\n\n${person}`;
+    }
+  },
+  "Arvato-Yannie": {
+    to: "ryan.ng@arvato.com; yannie.tang@arvato.com",
+    cc: "procurement.hk@arvato.com",
+    subject: date => `Balluff - Packing material / ${date}`,
+    body: (items, person, note) => `Dear Yannie\n\nPlease find the attached file for your reference.\n\n${note ? note + "\n\n" : ""}Best regards,\n\n${person}`
+  },
+  "木林森": {
+    to: "sales3@mlsplywood.com",
+    cc: "",
+    subject: date => `木林森-Balluff consumable - ${date}`,
+    body: (items, person, note) => {
+      const lines = items.map(i => `${i.qty} pcs of ${i.name}`);
+      return `Dear\n\n請安排以下物料：\n${lines.join("\n")}\n\n${note ? note + "\n\n" : ""}Best regards,\n\n${person}`;
+    }
+  },
+  "default": {
+    to: "",
+    cc: "",
+    subject: date => `Packing material order - ${date}`,
+    body: (items, person, note) => {
+      const lines = items.map(i => `${i.qty} ${i.um || "pcs"} of ${i.id} (${i.name})`);
+      return `Dear\n\nPlease help to order the following packing materials:\n\n${lines.join("\n")}\n\n${note ? note + "\n\n" : ""}Best regards,\n\n${person}`;
+    }
+  }
+};
+
+function renderOrderHistory() {
+  const sorted = [...orders].sort((a,b) => b.date.localeCompare(a.date) || b.id - a.id);
+  document.getElementById("orderHistory").innerHTML = sorted.length === 0
+    ? '<div class="empty">暫無下單紀錄</div>'
+    : `<table><tr><th>日期</th><th>供應商</th><th>物料</th><th>下單數量</th><th>已到貨</th><th>狀態</th><th></th></tr>` +
+      sorted.map(o => o.items.map(i => `<tr>
+        <td>${o.date}</td><td>${o.supplier}</td><td>${i.id}</td>
+        <td>${i.qty}</td><td>${i.received||0}</td>
+        <td class="${o.status==='已完成'?'status-OK':o.status==='部分到貨'?'status-Low':'status-Critical'}">${o.status}</td>
+        <td><button class="btn danger sm" data-del-order="${o.id}">刪除</button></td>
+      </tr>`).join("")).join("") + "</table>";
+  document.querySelectorAll("[data-del-order]").forEach(btn => {
+    btn.onclick = () => {
+      if (!requireLogin()) return;
+      const id = parseInt(btn.dataset.delOrder);
+      if (!confirm("確定刪除此下單紀錄？")) return;
+      orders = orders.filter(o => o.id !== id);
+      saveData();
+      toast("已刪除下單紀錄");
+      renderOrderHistory();
+    };
+  });
+}
+
+function fillOrderSelect() {
+  const sel = document.getElementById("inOrderId");
+  if (!sel) return;
+  const pending = orders.filter(o => o.status !== "已完成");
+  sel.innerHTML = '<option value="">無</option>' + pending.map(o => 
+    `<option value="${o.id}">#${o.id} ${o.date} ${o.supplier}</option>`
+  ).join("");
+}
+
+function renderOrder() {
+  const suppliers = [...new Set(materials.map(m => m.supplier).filter(Boolean))].sort();
+  const sel = document.getElementById("orderSupplier");
+  sel.innerHTML = suppliers.map(s => `<option value="${s}">${s}</option>`).join("");
+  if (suppliers.length) renderOrderItems(sel.value);
+  sel.onchange = () => renderOrderItems(sel.value);
+}
+
+function renderOrderItems(supplier) {
+  const list = getSortedMaterials().filter(m => m.supplier === supplier);
+  document.getElementById("orderItemList").innerHTML = list.length === 0
+    ? '<div class="empty">此供應商暫無物料</div>'
+    : `<table><tr><th>物料#</th><th>Description</th><th>SAP#</th><th>單位</th><th>下單數量</th></tr>
+       ${list.map(m => `<tr>
+         <td>${m.id}</td><td>${m.name}</td><td>${m.sap||''}</td><td>${m.um||''}</td>
+         <td><input type="number" min="0" data-order-mat="${m.id}" style="width:100px"></td>
+       </tr>`).join("")}</table>`;
+}
+
+document.getElementById("generateOrderBtn").onclick = () => {
+  const supplier = document.getElementById("orderSupplier").value;
+  const person = document.getElementById("orderPerson").value.trim() || "Alfred Yeung";
+  const note = document.getElementById("orderNote").value.trim();
+  const items = [];
+  document.querySelectorAll("[data-order-mat]").forEach(inp => {
+    const qty = parseInt(inp.value);
+    if (qty > 0) {
+      const m = materials.find(x => x.id === inp.dataset.orderMat);
+      if (m) items.push({ ...m, qty });
+    }
+  });
+  if (items.length === 0) return toast("請至少輸入一項下單數量");
+
+  const today = new Date().toISOString().slice(0,10);
+  const displayDate = new Date().toLocaleDateString("en-GB", { day:"2-digit", month:"short", year:"numeric" });
+  const tpl = SUPPLIER_TEMPLATES[supplier] || SUPPLIER_TEMPLATES.default;
+
+  document.getElementById("emailSubject").value = tpl.subject(displayDate);
+  document.getElementById("emailTo").value = tpl.to;
+  document.getElementById("emailBody").value = tpl.body(items, person, note);
+  document.getElementById("orderResult").style.display = "block";
+
+  // Save order record
+  const order = {
+    id: nextOrderId++,
+    date: today,
+    supplier,
+    person,
+    project: document.getElementById("orderProject").value.trim() || "Balluff",
+    note,
+    items: items.map(i => ({id: i.id, name: i.name, sap: i.sap, qty: i.qty, received: 0})),
+    status: "待到貨"
+  };
+  orders.push(order);
+  saveData();
+
+  window._currentOrder = { 
+    supplier, person, note, items, today, displayDate, tpl,
+    project: document.getElementById("orderProject").value.trim() || "Balluff"
+  };
+  toast("已生成 Email 並儲存下單紀錄");
+  renderOrderHistory();
+};
+
+document.getElementById("copyEmailBtn").onclick = () => {
+  const text = document.getElementById("emailBody").value;
+  navigator.clipboard.writeText(text).then(() => toast("已複製內文"));
+};
+
+document.getElementById("mailtoBtn").onclick = () => {
+  const to = document.getElementById("emailTo").value;
+  const sub = encodeURIComponent(document.getElementById("emailSubject").value);
+  const body = encodeURIComponent(document.getElementById("emailBody").value);
+  window.location.href = `mailto:${to}?subject=${sub}&body=${body}`;
+};
+
+const ADMIN_PWD = "admin123";
+let isLoggedIn = sessionStorage.getItem("wh_logged_in") === "1";
 
 function updateLoginUI() {
-  const statusEl = document.getElementById('loginStatus');
-  const loginBtn = document.getElementById('loginBtn');
-  const clearBtn = document.getElementById('clearBtn');
-  if (isLoggedIn) {
-    statusEl.textContent = '已登入 (admin)';
-    loginBtn.textContent = '登出';
-    loginBtn.onclick = logout;
-    clearBtn.style.display = 'inline-block';
-  } else {
-    statusEl.textContent = '未登入';
-    loginBtn.textContent = '登入';
-    loginBtn.onclick = () => document.getElementById('loginModal').classList.add('show');
-    clearBtn.style.display = 'none';
-  }
+  document.getElementById("loginStatus").textContent = isLoggedIn ? "已登入" : "未登入";
+  document.getElementById("loginBtn").textContent = isLoggedIn ? "登出" : "登入";
+  document.getElementById("loginBtn").onclick = isLoggedIn ? doLogout : showLogin;
 }
 
-function logout() {
+function showLogin() {
+  document.getElementById("loginModal").style.display = "flex";
+  document.getElementById("loginPwd").value = "";
+  document.getElementById("loginPwd").focus();
+}
+
+function doLogout() {
   isLoggedIn = false;
-  sessionStorage.removeItem('stationeryAdmin');
+  sessionStorage.removeItem("wh_logged_in");
   updateLoginUI();
-  toast('已登出');
-  if (document.getElementById('tab-records').style.display !== 'none') renderRecords();
+  toast("已登出");
 }
 
-function checkLogin() {
-  if (sessionStorage.getItem('stationeryAdmin') === 'true') {
+function requireLogin() {
+  if (isLoggedIn) return true;
+  toast("請先登入");
+  showLogin();
+  return false;
+}
+
+document.getElementById("loginCancel").onclick = () => document.getElementById("loginModal").style.display = "none";
+document.getElementById("loginSubmit").onclick = () => {
+  const pwd = document.getElementById("loginPwd").value;
+  if (pwd === ADMIN_PWD) {
     isLoggedIn = true;
-  }
-  updateLoginUI();
-}
-
-function updateCategorySelectOptions() {
-  allItems = getAllItems();
-  const cats = [...new Set(allItems.map(i => i.category))];
-  const sel = document.getElementById('newCat');
-  if (!sel) return;
-  const prev = sel.value;
-  sel.innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('') +
-    '<option value="__NEW__">＋ 自訂新分類...</option>';
-  if (prev && (cats.includes(prev) || prev === '__NEW__')) {
-    sel.value = prev;
-  }
-  document.getElementById('newCatCustomWrap').style.display = sel.value === '__NEW__' ? 'block' : 'none';
-}
-
-document.getElementById('newCat').onchange = e => {
-  document.getElementById('newCatCustomWrap').style.display = e.target.value === '__NEW__' ? 'block' : 'none';
-};
-
-function renderCategories() {
-  allItems = getAllItems();
-  const cats = [...new Set(allItems.map(i => i.category))];
-  if (currentCategory !== '全部' && !cats.includes(currentCategory)) {
-    currentCategory = '全部';
-  }
-  const el = document.getElementById('categoryFilters');
-  el.innerHTML = `<button class="${currentCategory==='全部'?'active':''}" data-cat="全部">全部</button>` +
-    cats.map(c => `<button class="${currentCategory===c?'active':''}" data-cat="${c}">${c}</button>`).join('');
-  el.querySelectorAll('button').forEach(btn => {
-    btn.onclick = () => { currentCategory = btn.dataset.cat; renderCategories(); renderItems(); };
-  });
-  updateCategorySelectOptions();
-}
-
-function escapeHtml(str) {
-  return String(str || '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
-function renderItems() {
-  allItems = getAllItems();
-  const filtered = allItems.filter(item => {
-    const catOk = currentCategory === '全部' || item.category === currentCategory;
-    const searchOk = !searchTerm || item.name.toLowerCase().includes(searchTerm.toLowerCase());
-    return catOk && searchOk;
-  });
-
-  document.getElementById('itemList').innerHTML = filtered.map(item => {
-    const itemLink = item.link || GARRET_CATALOG_URL;
-    const thumbHtml = item.image
-      ? `<a href="${escapeHtml(itemLink)}" target="_blank" rel="noopener noreferrer" title="查看產品頁"><img src="${escapeHtml(item.image)}" class="item-thumb" alt="${escapeHtml(item.name)}" onerror="this.style.display='none'"></a>`
-      : `<a href="${escapeHtml(itemLink)}" target="_blank" rel="noopener noreferrer" class="item-thumb-placeholder" title="前往 Garret 查看圖片">尚無<br>圖片</a>`;
-
-    return `
-      <div class="item" data-id="${item.id}">
-        <div class="item-info">
-          ${thumbHtml}
-          <div class="item-text">
-            <div class="item-name">
-              <a href="${escapeHtml(itemLink)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.name)}</a>
-            </div>
-            <div class="item-meta">
-              <span>${escapeHtml(item.category)} · ${escapeHtml(item.unit)}</span>
-              <a href="${escapeHtml(itemLink)}" target="_blank" rel="noopener noreferrer" class="item-link">Garret 參考 ↗</a>
-            </div>
-          </div>
-        </div>
-        <div class="qty-control">
-          <button data-action="minus" data-id="${item.id}">−</button>
-          <input type="number" min="0" value="${quantities[item.id]||0}" data-id="${item.id}" class="qty-input">
-          <button data-action="plus" data-id="${item.id}">+</button>
-        </div>
-        <div class="unit">${escapeHtml(item.unit)}</div>
-        <div class="item-actions">
-          <button class="icon-btn" data-edit-item="${item.id}" title="設定圖片與連結">圖/連</button>
-          <button class="icon-btn del" data-del-item="${item.id}" title="刪除此文具項目">刪除</button>
-        </div>
-      </div>
-    `;
-  }).join('') || '<div class="empty">沒有符合的項目</div>';
-
-  document.querySelectorAll('.qty-input').forEach(input => {
-    input.onchange = input.oninput = e => {
-      const id = +e.target.dataset.id;
-      quantities[id] = Math.max(0, parseInt(e.target.value) || 0);
-      updateSummary();
-    };
-  });
-  document.querySelectorAll('[data-action]').forEach(btn => {
-    btn.onclick = () => {
-      const id = +btn.dataset.id;
-      const delta = btn.dataset.action === 'plus' ? 1 : -1;
-      quantities[id] = Math.max(0, (quantities[id] || 0) + delta);
-      const input = document.querySelector(`.qty-input[data-id="${id}"]`);
-      if (input) input.value = quantities[id];
-      updateSummary();
-    };
-  });
-  document.querySelectorAll('[data-edit-item]').forEach(btn => {
-    btn.onclick = () => openEditItemModal(+btn.dataset.editItem);
-  });
-  document.querySelectorAll('[data-del-item]').forEach(btn => {
-    btn.onclick = () => deleteStationeryItem(+btn.dataset.delItem);
-  });
-}
-
-async function deleteStationeryItem(id) {
-  const item = getAllItems().find(i => Number(i.id) === Number(id));
-  if (!item) return;
-  if (!confirm(`確定要刪除文具項目「${item.name}」嗎？`)) return;
-
-  const isCustom = cachedCustomItems.some(c => Number(c.id) === Number(id));
-  if (isCustom) {
-    if (isGasConfigured()) {
-      try {
-        await apiPost({ action: 'deleteCustomItem', id });
-      } catch (e) {
-        console.warn('Cloud deleteCustomItem failed, hiding locally as well:', e);
-      }
-    }
-    cachedCustomItems = cachedCustomItems.filter(c => Number(c.id) !== Number(id));
-  }
-
-  const hidden = loadHiddenItemIds();
-  if (!hidden.includes(Number(id))) {
-    hidden.push(Number(id));
-    saveHiddenItemIds(hidden);
-  }
-
-  delete quantities[id];
-  renderCategories();
-  renderItems();
-  updateSummary();
-  toast(`已刪除文具「${item.name}」`);
-}
-
-function openEditItemModal(id) {
-  const item = getAllItems().find(i => Number(i.id) === Number(id));
-  if (!item) return;
-  document.getElementById('editItemId').value = item.id;
-  document.getElementById('editItemTitle').textContent = item.name;
-  document.getElementById('editItemLink').value = item.link || GARRET_CATALOG_URL;
-  document.getElementById('editItemImageUrl').value = (item.image && !item.image.startsWith('data:')) ? item.image : '';
-  document.getElementById('editItemImageFile').value = '';
-  document.getElementById('editItemPreview').innerHTML = item.image
-    ? `<img src="${escapeHtml(item.image)}" style="max-width:120px;max-height:120px;border-radius:8px">`
-    : '';
-  document.getElementById('editItemModal').classList.add('show');
-}
-
-document.getElementById('editItemImageFile').onchange = async e => {
-  const file = e.target.files[0];
-  const preview = document.getElementById('editItemPreview');
-  if (file) {
-    try {
-      const compressed = await compressImageDataUrl(file);
-      preview.innerHTML = `<img src="${compressed}" style="max-width:120px;max-height:120px;border-radius:8px">`;
-    } catch {
-      preview.innerHTML = '';
-    }
-  }
-};
-
-document.getElementById('saveEditItemBtn').onclick = async () => {
-  const id = +document.getElementById('editItemId').value;
-  const link = document.getElementById('editItemLink').value.trim() || GARRET_CATALOG_URL;
-  const imgUrl = document.getElementById('editItemImageUrl').value.trim();
-  const file = document.getElementById('editItemImageFile').files[0];
-
-  const item = getAllItems().find(i => Number(i.id) === Number(id));
-  if (!item) return;
-
-  let finalImage = item.image || '';
-  if (file) {
-    finalImage = await compressImageDataUrl(file);
-  } else if (imgUrl) {
-    finalImage = imgUrl;
-  }
-
-  const overrides = loadItemOverrides();
-  overrides[id] = { link, image: finalImage };
-  saveItemOverrides(overrides);
-
-  // If custom item and GAS configured, sync update
-  const customIdx = cachedCustomItems.findIndex(c => Number(c.id) === Number(id));
-  if (customIdx !== -1) {
-    cachedCustomItems[customIdx] = { ...cachedCustomItems[customIdx], link, image: finalImage };
-    if (isGasConfigured()) {
-      try {
-        await apiPost({ action: 'updateCustomItem', item: cachedCustomItems[customIdx] });
-      } catch (e) {
-        console.warn('Cloud updateCustomItem failed:', e);
-      }
-    }
-  }
-
-  document.getElementById('editItemModal').classList.remove('show');
-  renderItems();
-  toast('已更新文具圖片與連結');
-};
-
-document.getElementById('cancelEditItemBtn').onclick = () => {
-  document.getElementById('editItemModal').classList.remove('show');
-};
-
-function updateSummary() {
-  allItems = getAllItems();
-  const selected = allItems.filter(i => quantities[i.id] > 0);
-  const countEl = document.getElementById('selectedCount');
-  const itemsEl = document.getElementById('summaryItems');
-  const emptyEl = document.getElementById('sideEmpty');
-  const clearCartBtn = document.getElementById('clearCartBtn');
-
-  countEl.textContent = selected.length;
-
-  if (selected.length === 0) {
-    emptyEl.style.display = 'block';
-    itemsEl.style.display = 'none';
-    clearCartBtn.style.display = 'none';
-    return;
-  }
-
-  emptyEl.style.display = 'none';
-  itemsEl.style.display = 'block';
-  clearCartBtn.style.display = 'inline-block';
-
-  itemsEl.innerHTML = selected.map(i => `
-    <div class="summary-item">
-      <span class="summary-item-name">${escapeHtml(i.name)}</span>
-      <span class="summary-item-right">
-        <span>${quantities[i.id]} ${escapeHtml(i.unit)}</span>
-        <button class="summary-remove" data-remove-cart="${i.id}" title="移除此項">✕</button>
-      </span>
-    </div>
-  `).join('');
-
-  itemsEl.querySelectorAll('[data-remove-cart]').forEach(btn => {
-    btn.onclick = () => {
-      const id = +btn.dataset.removeCart;
-      quantities[id] = 0;
-      const input = document.querySelector(`.qty-input[data-id="${id}"]`);
-      if (input) input.value = 0;
-      updateSummary();
-    };
-  });
-}
-
-document.getElementById('clearCartBtn').onclick = () => {
-  quantities = {};
-  renderItems();
-  updateSummary();
-};
-
-async function switchTab(tab) {
-  document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-  document.getElementById('tab-order').style.display = tab === 'order' ? 'block' : 'none';
-  document.getElementById('tab-records').style.display = tab === 'records' ? 'block' : 'none';
-  document.getElementById('tab-status').style.display = tab === 'status' ? 'block' : 'none';
-  if (tab === 'records') {
-    await syncFromCloud(false);
-    renderRecords();
-  }
-  if (tab === 'status') {
-    await syncFromCloud(false);
-    renderStatusQuery();
-  }
-}
-
-function getStatusClass(status) {
-  if (status === '待下單') return 'pending';
-  if (status === '已下單') return 'ordered';
-  if (status === '已到貨') return 'arrived';
-  if (status === '已取消') return 'cancelled';
-  return '';
-}
-
-function updateMonthFilterOptions() {
-  const orders = loadOrders();
-  const months = [...new Set(orders.map(o => getMonthKey(o.orderDate || new Date(o.timestamp).toISOString().slice(0,10))))].sort().reverse();
-  const sel = document.getElementById('monthFilter');
-  const current = sel.value;
-  sel.innerHTML = '<option value="all">全部月份</option>' + months.map(m => `<option value="${m}">${m}</option>`).join('');
-  sel.value = months.includes(current) ? current : 'all';
-
-  const sel2 = document.getElementById('statusMonthFilter');
-  const current2 = sel2.value;
-  sel2.innerHTML = '<option value="all">全部月份</option>' + months.map(m => `<option value="${m}">${m}</option>`).join('');
-  sel2.value = months.includes(current2) ? current2 : 'all';
-}
-
-function updateBulkBar() {
-  const bar = document.getElementById('bulkBar');
-  const text = document.getElementById('selectedCountText');
-  text.textContent = `已選 ${selectedIds.size} 筆`;
-  bar.classList.toggle('show', selectedIds.size > 0 && isLoggedIn);
-}
-
-function renderRecords() {
-  updateMonthFilterOptions();
-  let orders = loadOrders();
-
-  if (monthFilter !== 'all') {
-    orders = orders.filter(o => getMonthKey(o.orderDate || new Date(o.timestamp).toISOString().slice(0,10)) === monthFilter);
-  }
-  if (deptFilter !== 'all') {
-    orders = orders.filter(o => (o.department || '') === deptFilter);
-  }
-  if (statusFilter !== 'all') {
-    orders = orders.filter(o => (o.status || '待下單') === statusFilter);
-  }
-
-  orders.sort((a, b) => {
-    const da = a.orderDate || new Date(a.timestamp).toISOString().slice(0,10);
-    const db = b.orderDate || new Date(b.timestamp).toISOString().slice(0,10);
-    return db.localeCompare(da);
-  });
-
-  const el = document.getElementById('recordsList');
-  if (orders.length === 0) {
-    el.innerHTML = '<div class="empty">暫無下單紀錄</div>';
-    updateBulkBar();
-    return;
-  }
-
-  const groups = {};
-  orders.forEach(o => {
-    const key = getMonthKey(o.orderDate || new Date(o.timestamp).toISOString().slice(0,10));
-    if (!groups[key]) groups[key] = [];
-    groups[key].push(o);
-  });
-
-  const sortedMonths = Object.keys(groups).sort().reverse();
-
-  el.innerHTML = sortedMonths.map(month => {
-    const list = groups[month];
-    return `
-      <div class="month-group">
-        <div class="month-title">
-          <span>${month} <span class="count">(${list.length} 筆)</span></span>
-          ${isLoggedIn ? `<button class="btn secondary" style="width:auto; padding:6px 12px; font-size:0.85rem" data-select-month="${month}">全選此月</button>` : ''}
-        </div>
-        ${list.map(o => {
-          const status = o.status || '待下單';
-          const date = o.orderDate || new Date(o.timestamp).toISOString().slice(0,10);
-          const checked = selectedIds.has(o.id) ? 'checked' : '';
-          return `
-            <div class="order-card" data-id="${o.id}">
-              <div class="order-header">
-                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap">
-                  ${isLoggedIn ? `<label class="checkbox-label"><input type="checkbox" class="order-check" data-id="${o.id}" ${checked}> 選取</label>` : ''}
-                  <strong>${escapeHtml(o.requester || '未填姓名')}</strong>
-                  <span class="badge">${escapeHtml(o.department || '未選部門')}</span>
-                  <span class="badge ${getStatusClass(status)}">${escapeHtml(status)}</span>
-                </div>
-                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                  <span style="color:var(--muted);font-size:0.85rem">${date}</span>
-                  ${isLoggedIn ? `
-                    <select class="status-select" data-id="${o.id}">
-                      ${STATUSES.map(s => `<option value="${s}" ${s===status?'selected':''}>${s}</option>`).join('')}
-                    </select>
-                  ` : `<span style="font-size:0.85rem;color:var(--muted)">（登入後可改狀態）</span>`}
-                </div>
-              </div>
-              ${o.contact ? `<div style="font-size:0.85rem;color:var(--muted)">聯絡：${escapeHtml(o.contact)}</div>` : ''}
-              ${o.notes ? `<div style="font-size:0.85rem;margin:6px 0">備註：${escapeHtml(o.notes)}</div>` : ''}
-              <div style="margin-top:8px">
-                ${o.items.map(it => `<div style="font-size:0.9rem">${escapeHtml(it.name)} × ${it.qty} ${escapeHtml(it.unit)}</div>`).join('')}
-              </div>
-              ${isLoggedIn ? `<button class="btn secondary" style="margin-top:10px;width:auto;padding:6px 12px;font-size:0.85rem" data-del="${o.id}">刪除這筆</button>` : '<div style="margin-top:8px;font-size:0.8rem;color:var(--muted)">登入後可刪除</div>'}
-            </div>
-          `;
-        }).join('')}
-      </div>
-    `;
-  }).join('');
-
-  if (isLoggedIn) {
-    document.querySelectorAll('.order-check').forEach(cb => {
-      cb.onchange = () => {
-        const id = +cb.dataset.id;
-        if (cb.checked) selectedIds.add(id);
-        else selectedIds.delete(id);
-        updateBulkBar();
-      };
-    });
-
-    document.querySelectorAll('[data-select-month]').forEach(btn => {
-      btn.onclick = () => {
-        const month = btn.dataset.selectMonth;
-        const monthOrders = groups[month] || [];
-        monthOrders.forEach(o => selectedIds.add(o.id));
-        renderRecords();
-        updateBulkBar();
-      };
-    });
-
-    document.querySelectorAll('.status-select').forEach(sel => {
-      sel.onchange = async () => {
-        if (!isLoggedIn) return toast('請先登入');
-        const id = +sel.dataset.id;
-        const orders = loadOrders();
-        const order = orders.find(o => o.id === id);
-        if (order) {
-          const oldStatus = order.status;
-          order.status = sel.value;
-          sel.disabled = true;
-          try {
-            await apiPost({ action: 'updateOrder', order });
-            saveOrders(orders);
-            toast('狀態已同步更新');
-            renderRecords();
-          } catch (e) {
-            order.status = oldStatus;
-            sel.disabled = false;
-            setSyncBadge('雲端連線失敗', 'err');
-            toast('更新失敗，請檢查網路');
-          }
-        }
-      };
-    });
-
-    document.querySelectorAll('[data-del]').forEach(btn => {
-      btn.onclick = async () => {
-        if (!isLoggedIn) return toast('請先登入');
-        if (!confirm('確定刪除這筆紀錄？')) return;
-        const id = +btn.dataset.del;
-        btn.disabled = true;
-        try {
-          await apiPost({ action: 'deleteOrder', id });
-          const orders = loadOrders().filter(o => o.id !== id);
-          saveOrders(orders);
-          selectedIds.delete(id);
-          renderRecords();
-          toast('已從雲端刪除');
-        } catch (e) {
-          btn.disabled = false;
-          setSyncBadge('雲端連線失敗', 'err');
-          toast('刪除失敗，請檢查網路');
-        }
-      };
-    });
-  }
-
-  updateBulkBar();
-}
-
-function renderStatusQuery() {
-  updateMonthFilterOptions();
-  let orders = loadOrders();
-
-  if (statusMonthFilter !== 'all') {
-    orders = orders.filter(o => getMonthKey(o.orderDate || new Date(o.timestamp).toISOString().slice(0,10)) === statusMonthFilter);
-  }
-  if (statusDeptFilter !== 'all') {
-    orders = orders.filter(o => (o.department || '') === statusDeptFilter);
-  }
-  if (statusQueryFilter !== 'all') {
-    orders = orders.filter(o => (o.status || '待下單') === statusQueryFilter);
-  }
-
-  const all = loadOrders();
-  const stats = {
-    '待下單': all.filter(o => (o.status || '待下單') === '待下單').length,
-    '已下單': all.filter(o => o.status === '已下單').length,
-    '已到貨': all.filter(o => o.status === '已到貨').length,
-    '已取消': all.filter(o => o.status === '已取消').length
-  };
-
-  document.getElementById('statGrid').innerHTML = Object.entries(stats).map(([s, n]) => `
-    <div class="stat-card">
-      <div class="num">${n}</div>
-      <div class="label">${s}</div>
-    </div>
-  `).join('');
-
-  const el = document.getElementById('statusList');
-  if (orders.length === 0) {
-    el.innerHTML = '<div class="empty">沒有符合條件的紀錄</div>';
-    return;
-  }
-
-  orders.sort((a, b) => {
-    const da = a.orderDate || new Date(a.timestamp).toISOString().slice(0,10);
-    const db = b.orderDate || new Date(b.timestamp).toISOString().slice(0,10);
-    return db.localeCompare(da);
-  });
-
-  el.innerHTML = orders.map(o => {
-    const status = o.status || '待下單';
-    const date = o.orderDate || new Date(o.timestamp).toISOString().slice(0,10);
-    return `
-      <div class="order-card">
-        <div class="order-header">
-          <div>
-            <strong>${escapeHtml(o.requester || '未填姓名')}</strong>
-            <span class="badge">${escapeHtml(o.department || '未選部門')}</span>
-            <span class="badge ${getStatusClass(status)}">${escapeHtml(status)}</span>
-          </div>
-          <span style="color:var(--muted);font-size:0.85rem">${date}</span>
-        </div>
-        <div style="font-size:0.9rem;margin-top:6px">
-          ${o.items.map(it => `${escapeHtml(it.name)} × ${it.qty} ${escapeHtml(it.unit)}`).join('　')}
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
-// Filters & Manual Refresh
-document.getElementById('monthFilter').onchange = e => { monthFilter = e.target.value; selectedIds.clear(); renderRecords(); };
-document.getElementById('deptFilter').onchange = e => { deptFilter = e.target.value; selectedIds.clear(); renderRecords(); };
-document.getElementById('statusFilter').onchange = e => { statusFilter = e.target.value; selectedIds.clear(); renderRecords(); };
-document.getElementById('statusQueryFilter').onchange = e => { statusQueryFilter = e.target.value; renderStatusQuery(); };
-document.getElementById('statusDeptFilter').onchange = e => { statusDeptFilter = e.target.value; renderStatusQuery(); };
-document.getElementById('statusMonthFilter').onchange = e => { statusMonthFilter = e.target.value; renderStatusQuery(); };
-
-document.getElementById('refreshRecordsBtn').onclick = async () => {
-  await syncFromCloud(true);
-  renderRecords();
-};
-document.getElementById('refreshStatusBtn').onclick = async () => {
-  await syncFromCloud(true);
-  renderStatusQuery();
-};
-
-// Bulk update (login required)
-document.getElementById('bulkUpdateBtn').onclick = async () => {
-  if (!isLoggedIn) return toast('請先登入');
-  const newStatus = document.getElementById('bulkStatus').value;
-  if (!newStatus) return toast('請選擇新狀態');
-  if (selectedIds.size === 0) return toast('請先選取紀錄');
-
-  const btn = document.getElementById('bulkUpdateBtn');
-  btn.disabled = true;
-  const orders = loadOrders();
-  const targetOrders = orders.filter(o => selectedIds.has(o.id));
-  const ids = targetOrders.map(o => o.id);
-
-  try {
-    await apiPost({ action: 'bulkUpdateStatus', ids, status: newStatus });
-    targetOrders.forEach(o => { o.status = newStatus; });
-    saveOrders(orders);
-    selectedIds.clear();
-    document.getElementById('bulkStatus').value = '';
-    toast(`已同步更新 ${targetOrders.length} 筆狀態為「${newStatus}」`);
-    renderRecords();
-  } catch (e) {
-    setSyncBadge('雲端連線失敗', 'err');
-    toast('批次更新失敗，請檢查網路');
-  } finally {
-    btn.disabled = false;
-  }
-};
-
-// Export detail CSV
-document.getElementById('exportBtn').onclick = () => {
-  const orders = loadOrders();
-  if (orders.length === 0) return toast('沒有紀錄可匯出');
-  let csv = '月份,下單日期,下單人,部門,狀態,聯絡,備註,項目,數量,單位\n';
-  orders.forEach(o => {
-    const date = o.orderDate || new Date(o.timestamp).toISOString().slice(0,10);
-    const month = getMonthKey(date);
-    const status = o.status || '待下單';
-    o.items.forEach(it => {
-      csv += `"${month}","${date}","${o.requester||''}","${o.department||''}","${status}","${o.contact||''}","${(o.notes||'').replace(/"/g,'""')}","${it.name}","${it.qty}","${it.unit}"\n`;
-    });
-  });
-  const blob = new Blob(['﻿' + csv], {type: 'text/csv;charset=utf-8'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `文具下單明細_${new Date().toISOString().slice(0,10)}.csv`;
-  a.click();
-  toast('已匯出明細 CSV');
-};
-
-document.getElementById('exportBackupBtn').onclick = () => {
-  const backup = {
-    version: 1,
-    exportedAt: new Date().toISOString(),
-    orders: loadOrders(),
-    customItems: loadCustomItems(),
-    itemOverrides: loadItemOverrides(),
-    hiddenItemIds: loadHiddenItemIds()
-  };
-  const blob = new Blob([JSON.stringify(backup, null, 2)], {type: 'application/json'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `文具下單完整備份_${new Date().toISOString().slice(0,10)}.json`;
-  a.click();
-  toast('已匯出完整備份（含訂單及自訂文具）');
-};
-
-document.getElementById('exportMonthBtn').onclick = () => {
-  const month = monthFilter === 'all' ? prompt('請輸入要匯出的月份（格式：2026-10）') : monthFilter;
-  if (!month) return;
-  const orders = loadOrders().filter(o => getMonthKey(o.orderDate || new Date(o.timestamp).toISOString().slice(0,10)) === month);
-  if (orders.length === 0) return toast('該月份沒有下單紀錄');
-
-  allItems = getAllItems();
-  const summary = {};
-  allItems.forEach(item => {
-    summary[item.id] = { ...item, depts: Object.fromEntries(DEPTS.map(d => [d, 0])), total: 0 };
-  });
-
-  orders.forEach(o => {
-    const dept = o.department || '其他';
-    o.items.forEach(it => {
-      const item = allItems.find(i => i.name === it.name);
-      if (item && summary[item.id]) {
-        summary[item.id].depts[dept] = (summary[item.id].depts[dept] || 0) + it.qty;
-        summary[item.id].total += it.qty;
-      }
-    });
-  });
-
-  let csv = '分類,中文名稱,' + DEPTS.join(',') + ',Sum,單位\n';
-  Object.values(summary).forEach(s => {
-    if (s.total > 0) {
-      const deptVals = DEPTS.map(d => s.depts[d] || 0).join(',');
-      csv += `"${s.category}","${s.name}",${deptVals},${s.total},"${s.unit}"\n`;
-    }
-  });
-
-  const blob = new Blob(['﻿' + csv], {type: 'text/csv;charset=utf-8'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `文具下單總計_${month}.csv`;
-  a.click();
-  toast(`已匯出 ${month} 月份總計`);
-};
-
-document.getElementById('clearBtn').onclick = async () => {
-  if (!isLoggedIn) return toast('請先登入');
-  if (confirm('確定清空所有下單紀錄？此操作將同步清空雲端試算表且無法復原。')) {
-    const btn = document.getElementById('clearBtn');
-    btn.disabled = true;
-    try {
-      await apiPost({ action: 'clearOrders' });
-      saveOrders([]);
-      selectedIds.clear();
-      renderRecords();
-      toast('已清空所有紀錄');
-    } catch (e) {
-      setSyncBadge('雲端連線失敗', 'err');
-      toast('清空失敗，請檢查網路');
-    } finally {
-      btn.disabled = false;
-    }
-  }
-};
-
-document.getElementById('submitBtn').onclick = async () => {
-  const requester = document.getElementById('requester').value.trim();
-  const department = document.getElementById('department').value;
-  const orderDate = document.getElementById('orderDate').value;
-  const contact = document.getElementById('contact').value.trim();
-  const notes = document.getElementById('notes').value.trim();
-
-  allItems = getAllItems();
-  const items = allItems.filter(i => quantities[i.id] > 0).map(i => ({
-    name: i.name, qty: quantities[i.id], unit: i.unit, category: i.category
-  }));
-
-  if (!requester) return toast('請填寫下單人姓名');
-  if (!department) return toast('請選擇部門');
-  if (!orderDate) return toast('請選擇下單日期');
-  if (items.length === 0) return toast('請至少選擇一項文具');
-
-  const order = {
-    id: Date.now(),
-    timestamp: Date.now(),
-    orderDate,
-    status: '待下單',
-    requester, department, contact, notes, items
-  };
-
-  const btn = document.getElementById('submitBtn');
-  btn.disabled = true;
-  btn.textContent = '提交中...';
-
-  try {
-    await apiPost({ action: 'addOrder', order });
-    const orders = loadOrders();
-    orders.push(order);
-    saveOrders(orders);
-
-    quantities = {};
-    document.getElementById('requester').value = '';
-    document.getElementById('contact').value = '';
-    document.getElementById('notes').value = '';
-    document.getElementById('department').value = '';
-    document.getElementById('orderDate').value = new Date().toISOString().slice(0,10);
-    renderItems();
-    updateSummary();
-    toast('下單成功並已同步到雲端！狀態：待下單');
-  } catch (e) {
-    setSyncBadge('雲端連線失敗', 'err');
-    toast('下單失敗，請檢查 Google Apps Script 網址設定');
-  } finally {
-    btn.disabled = false;
-    btn.textContent = '提交下單';
-  }
-};
-
-document.getElementById('search').oninput = e => {
-  searchTerm = e.target.value;
-  renderItems();
-};
-
-document.querySelectorAll('.tabs button').forEach(btn => {
-  btn.onclick = () => switchTab(btn.dataset.tab);
-});
-
-// Add item (category dropdown, optional link & image URL or local upload)
-document.getElementById('toggleAddItem').onclick = () => {
-  updateCategorySelectOptions();
-  document.getElementById('addItemForm').classList.toggle('show');
-};
-
-function compressImageDataUrl(file, maxSize = 240, quality = 0.7) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onerror = reject;
-    reader.onload = ev => {
-      const img = new Image();
-      img.onerror = reject;
-      img.onload = () => {
-        let w = img.width;
-        let h = img.height;
-        if (w > maxSize || h > maxSize) {
-          if (w > h) {
-            h = Math.round((h * maxSize) / w);
-            w = maxSize;
-          } else {
-            w = Math.round((w * maxSize) / h);
-            h = maxSize;
-          }
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = w;
-        canvas.height = h;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, w, h);
-        resolve(canvas.toDataURL('image/jpeg', quality));
-      };
-      img.src = ev.target.result;
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
-document.getElementById('newImage').onchange = async e => {
-  const file = e.target.files[0];
-  const preview = document.getElementById('imagePreview');
-  if (file) {
-    try {
-      const compressed = await compressImageDataUrl(file);
-      preview.innerHTML = `<img src="${compressed}" style="max-width:120px;max-height:120px;border-radius:8px">`;
-    } catch {
-      preview.innerHTML = '';
-    }
-  } else {
-    preview.innerHTML = '';
-  }
-};
-
-document.getElementById('saveNewItem').onclick = async () => {
-  const catSel = document.getElementById('newCat').value;
-  const cat = catSel === '__NEW__' ? document.getElementById('newCatCustom').value.trim() : catSel;
-  const name = document.getElementById('newName').value.trim();
-  const unit = document.getElementById('newUnit').value.trim();
-  const link = document.getElementById('newLink').value.trim() || GARRET_CATALOG_URL;
-  const imageUrl = document.getElementById('newImageUrl').value.trim();
-  const fileInput = document.getElementById('newImage');
-  const file = fileInput.files[0];
-
-  if (!cat || !name || !unit) return toast('請填寫分類、名稱、單位');
-  if (!file && !imageUrl) return toast('請上傳商品圖片或填寫圖片網址');
-
-  const btn = document.getElementById('saveNewItem');
-  btn.disabled = true;
-  btn.textContent = '儲存中...';
-
-  try {
-    const finalImage = file ? await compressImageDataUrl(file) : imageUrl;
-    const newItem = { id: Date.now(), category: cat, name, unit, link, image: finalImage };
-    if (isGasConfigured()) {
-      await apiPost({ action: 'addCustomItem', item: newItem });
-    }
-
-    const custom = loadCustomItems();
-    custom.push(newItem);
-    saveCustomItems(custom);
-
-    document.getElementById('newCatCustom').value = '';
-    document.getElementById('newName').value = '';
-    document.getElementById('newUnit').value = '';
-    document.getElementById('newLink').value = '';
-    document.getElementById('newImageUrl').value = '';
-    fileInput.value = '';
-    document.getElementById('imagePreview').innerHTML = '';
-    document.getElementById('addItemForm').classList.remove('show');
-    renderCategories();
-    renderItems();
-    toast('已新增文具項目');
-  } catch (e) {
-    setSyncBadge('雲端連線失敗', 'err');
-    toast('新增文具失敗，請檢查網路或網址設定');
-  } finally {
-    btn.disabled = false;
-    btn.textContent = '儲存新項目';
-  }
-};
-
-// Login
-document.getElementById('doLoginBtn').onclick = () => {
-  const user = document.getElementById('loginUser').value.trim();
-  const pass = document.getElementById('loginPass').value;
-  if (user === ADMIN_USER && pass === ADMIN_PASS) {
-    isLoggedIn = true;
-    sessionStorage.setItem('stationeryAdmin', 'true');
-    document.getElementById('loginModal').classList.remove('show');
-    document.getElementById('loginPass').value = '';
+    sessionStorage.setItem("wh_logged_in", "1");
+    document.getElementById("loginModal").style.display = "none";
     updateLoginUI();
-    toast('登入成功');
-    if (document.getElementById('tab-records').style.display !== 'none') renderRecords();
+    toast("登入成功");
   } else {
-    toast('帳號或密碼錯誤');
+    toast("密碼錯誤");
   }
 };
-document.getElementById('cancelLoginBtn').onclick = () => {
-  document.getElementById('loginModal').classList.remove('show');
-};
-document.getElementById('loginBtn').onclick = () => document.getElementById('loginModal').classList.add('show');
 
-// Init
-async function initApp() {
-  document.getElementById('orderDate').value = new Date().toISOString().slice(0,10);
-  checkLogin();
-  renderCategories();
-  renderItems();
-  updateSummary();
-  await syncFromCloud(false);
-  renderCategories();
-  renderItems();
-}
-initApp();
+updateLoginUI();
+
+document.querySelectorAll(".tabs button").forEach(btn => btn.onclick = () => switchTab(btn.dataset.tab));
+
+loadData().then(() => switchTab("dashboard"));
 </script>
 </body>
 </html>
